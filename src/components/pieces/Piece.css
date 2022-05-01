@@ -1,0 +1,47 @@
+:root {
+    --piece-scale: 0.7;
+}
+
+.piece {
+    display: inline-block;
+    background: url(./pieces.png);
+    width: calc(200px * var(--piece-scale));
+    height: calc(200px * var(--piece-scale));
+    background-position-x: 0;
+    background-position-y: 0;
+    background-size: calc(1200px * var(--piece-scale)) calc(400px * var(--piece-scale));
+    /* transform: scale(0.5);
+    transform-origin: 0 0; */
+}
+
+.black {
+    background-position-y: calc(-200px * var(--piece-scale));
+}
+
+.white {
+    background-position-y: 0;
+}
+
+.king {
+    background-position-x: 0;
+}
+
+.queen {
+    background-position-x: calc(-200px * var(--piece-scale));
+}
+
+.bishop {
+    background-position-x: calc(-400px * var(--piece-scale));
+}
+
+.knight {
+    background-position-x: calc(-600px * var(--piece-scale));
+}
+
+.rook {
+    background-position-x: calc(-800px * var(--piece-scale));
+}
+
+.pawn {
+    background-position-x: calc(-1000px * var(--piece-scale));
+}
