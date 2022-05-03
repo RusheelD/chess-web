@@ -38,7 +38,7 @@ function App() {
       </header>
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
-      <Board>The board exists</Board>
+      <Board children={null}/>
       <div/>
     </div>
   );
