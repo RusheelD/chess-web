@@ -8,10 +8,10 @@ export interface TileProps {
 
 export function Tile(props: TileProps) { 
     var scale = (parseInt(props.rank)%2 + (props.file.charCodeAt(0) - 96)%2)%2;
-    var color = 180 * scale + 75;
+    var tileStyle = scale ? 'whiteTile' : 'blackTile';
     return(
     <div style={{display: 'inline-block'}}>
-        {<span className={'tile ' + props.file + ' _' + props.rank} style={{background: 'rgb(' + color + ', ' + color + ', ' + color + ')'}}>
+        {<span className={'tile ' + props.file + ' _' + props.rank + ' ' + tileStyle}>
             {props.children}
         </span>}
     </div>

@@ -39,6 +39,7 @@ function App() {
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
       <Board children={null}/>
+      <div style={{height: '50px'}}/>
       <div/>
     </div>
   );

@@ -18,7 +18,7 @@ export function Board(props: BoardProps) {
         }
         rows.push(<div style={{display:'inline-block'}} className={'row'} children={tiles}></div>);
     }
-    var span = React.createElement('span', {className: 'board'})
-    var div = React.createElement('div', {display: 'inline-block'}, [props.children, span, rows])
+    // var span = React.createElement('span', {className: 'board'})
+    var div = React.createElement('div', {display: 'inline-block'}, [props.children, rows])
     return(div);
 }
