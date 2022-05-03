@@ -2,13 +2,21 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Piece } from './components/pieces/Piece';
+import { Tile } from './components/tiles/Tile';
 
 function App() {
   return (
     <div className="App">
-      <Piece color='black' name='king' />
-      <Piece color='white' name='king' />
-      <Piece color='white' name='rook' />
+      <Tile rank='1' file='a'>
+        <Piece color='black' name='king' />
+      </Tile>
+      <Tile rank='1' file='b'>
+        <Piece color='white' name='king' />
+      </Tile>
+      <Tile rank='1' file='c'>
+        <Piece color='white' name='rook' />
+      </Tile>
+      <Tile rank='1' file='d' children={null}></Tile>
 
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
