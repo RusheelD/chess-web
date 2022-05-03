@@ -13,10 +13,13 @@ function App() {
       <Tile rank='1' file='b'>
         <Piece color='white' name='king' />
       </Tile>
-      <Tile rank='1' file='c'>
+      <Tile rank='1' file='c' children={null}/>
+      <Tile rank='1' file='d' >
         <Piece color='white' name='rook' />
       </Tile>
-      <Tile rank='1' file='d' children={null}></Tile>
+      <Tile rank='1' file='e'>
+        <Piece color='black' name='queen'/>
+      </Tile>
 
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
