@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { Piece } from './components/pieces/Piece';
 import { Tile } from './components/tiles/Tile';
+import { Board } from './components/boards/Board'
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
       </header>
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
+      <Board>The board exists</Board>
+      <div/>
     </div>
   );
 }

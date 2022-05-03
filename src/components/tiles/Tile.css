@@ -1,46 +1,9 @@
 :root {
     --tile-scale: 0.7;
-    --file-offset: 0;
-    --rank-offset: 0;
-    --color-factor: 0;
 }
 
 .tile {
     display: inline-block;
-    --color-factor: calc(255 * (var(--file-offset) + var(--rank-offset)));
-    /*background: rgb(var(--color-factor), var(--color-factor), var(--color-factor));*/
     width: calc(200px * var(--tile-scale));
     height: calc(200px * var(--tile-scale));
-}
-
-.a {
-    --file-offset: 1;
-}
-
-.b {
-    --file-offset: 0;
-}
-
-.c {
-    --file-offset: 1;
-}
-
-.d {
-    --file-offset: 0;
-}
-
-.e {
-    --file-offset: 1;
-}
-
-.f {
-    --file-offset: 0;
-}
-
-.g {
-    --file-offset: 1;
-}
-
-.h {
-    --file-offset: 0;
 }

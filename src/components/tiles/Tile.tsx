@@ -1,4 +1,3 @@
-import { readBuilderProgram } from 'typescript';
 import './Tile.css';
 
 export interface TileProps {
@@ -15,7 +14,6 @@ export function Tile(props: TileProps) {
         {<span className={'tile ' + props.file + props.rank} style={{background: 'rgb(' + color + ', ' + color + ', ' + color + ')'}}>
             {props.children}
         </span>}
-        
     </div>
 );
 }
