@@ -7,7 +7,7 @@ import { Board } from './components/boards/Board'
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{background: 'gray'}}>
       <Tile rank='1' file='a'>
         <Piece color='black' name='king' />
       </Tile>

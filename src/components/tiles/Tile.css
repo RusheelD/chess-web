@@ -1,9 +1,35 @@
 :root {
-    --tile-scale: 0.7;
+    --tile-scale: 0.5;
 }
 
 .tile {
     display: inline-block;
     width: calc(200px * var(--tile-scale));
     height: calc(200px * var(--tile-scale));
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.a {
+    border-left-style: solid;
+    border-left-color: black;
+    border-left-width: 4px;
+}
+
+.h {
+    border-right-style: solid;
+    border-right-color: black;
+    border-right-width: 4px;
+}
+
+._1 {
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 4px;
+}
+
+._8 {
+    border-top-style: solid;
+    border-top-color: black;
+    border-top-width: 4px;
 }

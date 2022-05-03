@@ -11,7 +11,7 @@ export function Tile(props: TileProps) {
     var color = 180 * scale + 75;
     return(
     <div style={{display: 'inline-block'}}>
-        {<span className={'tile ' + props.file + props.rank} style={{background: 'rgb(' + color + ', ' + color + ', ' + color + ')'}}>
+        {<span className={'tile ' + props.file + ' _' + props.rank} style={{background: 'rgb(' + color + ', ' + color + ', ' + color + ')'}}>
             {props.children}
         </span>}
     </div>
