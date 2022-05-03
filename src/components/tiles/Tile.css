@@ -19,7 +19,15 @@
 }
 
 .blackTile {
-    background-color: rgb(75, 75, 75);
+    background-color: rgb(100, 100, 100);
+}
+
+.clicked {
+    background-color: green;
+}
+
+.possible {
+    background-color: rgba(255, 255, 0, 0.5);
 }
 
 .a {
