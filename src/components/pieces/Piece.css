@@ -10,8 +10,6 @@
     background-position-x: 0;
     background-position-y: 0;
     background-size: calc(1200px * var(--piece-scale)) calc(400px * var(--piece-scale));
-    /* transform: scale(0.5);
-    transform-origin: 0 0; */
 }
 
 .black {

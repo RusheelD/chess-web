@@ -2,6 +2,13 @@
   text-align: center;
 }
 
+.piece-holder {
+  display: inline-block;
+  background-color: white;
+  border: 2px solid black;
+  padding: 2px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

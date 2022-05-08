@@ -8,6 +8,12 @@ import { Board } from './components/boards/Board'
 function App() {
   return (
     <div className="App" style={{background: 'gray'}}>
+      <div>
+        <div className='piece-holder'>
+          <Piece name='queen' color='black' />
+        </div>
+      </div>
+      <div style={{ height: "20px" }} />
       <Tile rank='1' file='a'>
         <Piece color='black' name='king' />
       </Tile>
