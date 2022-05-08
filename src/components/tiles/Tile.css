@@ -1,17 +1,21 @@
-:root {
-    --tile-scale: 0.5;
-}
-
 .tile {
     display: inline-block;
-    width: calc(200px * var(--tile-scale));
-    height: calc(200px * var(--tile-scale));
-    border-style: solid;
+
+    /* border-style: solid;
     border-color: black;
     border-top-width: 4px;
     border-bottom-width: 4px;
     border-left-width: 2px;
-    border-right-width: 2px;
+    border-right-width: 2px; */
+    /* margin-left: 2px;
+    margin-bottom: 2px; */
+    border: 2px solid black;
+}
+
+.tile > span {
+    display: inline-block;
+    width: calc(var(--piece-width) * var(--piece-scale));
+    height: calc(var(--piece-height) * var(--piece-scale));
 }
 
 .whiteTile {
@@ -30,7 +34,7 @@
     background-color: rgba(255, 255, 0, 0.5);
 }
 
-.a {
+/* .a {
     border-left-style: solid;
     border-left-color: black;
     border-left-width: 8px;
@@ -52,4 +56,4 @@
     border-top-style: solid;
     border-top-color: black;
     border-top-width: 8px;
-}
+} */

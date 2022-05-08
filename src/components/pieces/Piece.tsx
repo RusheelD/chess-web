@@ -6,7 +6,5 @@ export interface PieceProps {
 }
 
 export const Piece = (props: PieceProps) => (
-    <div style={{display: 'inline-block'}}>
-        <span className={'piece ' + props.color + ' ' + props.name} />
-    </div>
+    <span className={'piece ' + props.color + ' ' + props.name} />
 );

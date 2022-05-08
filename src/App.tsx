@@ -7,14 +7,23 @@ import { Board } from './components/boards/Board'
 
 function App() {
   return (
-    <div className="App" style={{background: 'gray'}}>
+    <div className="App">
       <div>
         <div className='piece-holder'>
           <Piece name='queen' color='black' />
         </div>
+        <div className='piece-holder big-piece'>
+          <Piece name='queen' color='black' />
+        </div>
+        <div className='piece-holder small-piece'>
+          <Piece name='queen' color='black' />
+        </div>
       </div>
       <div style={{ height: "20px" }} />
-      <Tile rank='1' file='a'>
+
+      <Tile rank='1' file='a' piece={{color: "black", name: "king"}} />
+
+      {/* <Tile rank='1' file='a'>
         <Piece color='black' name='king' />
       </Tile>
       <Tile rank='1' file='b'>
@@ -26,9 +35,9 @@ function App() {
       </Tile>
       <Tile rank='1' file='e'>
         <Piece color='black' name='queen'/>
-      </Tile>
+      </Tile> */}
 
-      <header className="App-header">
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edited <code>src/App.tsx</code> and saved, and this now reloads.
@@ -41,7 +50,7 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+      </header> */}
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
       <Board children={null}/>

@@ -1,4 +1,3 @@
-import { isValidInputTimeValue } from '@testing-library/user-event/dist/utils';
 import React from 'react';
 import { Piece, PieceProps } from '../pieces/Piece';
 import { Tile } from '../tiles/Tile'
@@ -31,7 +30,7 @@ export function Board(props: BoardProps) {
             if(pieceMap.has(tile)) {
                 child = <Piece color={pieceMap.get(tile)!.color} name={pieceMap.get(tile)!.name}/>
             }
-            tiles.push(<Tile rank={rank} file={file} children={child}/>);
+            tiles.push(<Tile rank={rank} file={file} piece={child ? child.props : null }/>);
         }
         rows.push(<div style={{display:'inline-block'}} className={'row'} children={tiles}></div>);
     }

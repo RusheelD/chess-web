@@ -3,11 +3,11 @@
 }
 
 .row {
-    height: 100px;
+    /* height: 100px; */
     vertical-align: top;
 }
 
 div {
     vertical-align: top;
-    display: inline-block;
+    /* display: inline-block; */
 }

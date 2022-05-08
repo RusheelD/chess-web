@@ -1,21 +1,22 @@
 import { useState } from 'react';
+import { Piece, PieceProps } from '../pieces/Piece';
 import './Tile.css';
 
 export interface TileProps {
     rank: string;
     file: string;
-    children: any;
+    piece?: PieceProps;
 }
 
 export function Tile(props: TileProps) {
     const [clickStatus, setClickStatus] = useState(false);
-    var scale = (parseInt(props.rank)%2 + (props.file.charCodeAt(0) - 96)%2)%2;
-    var tileStyle = scale ? 'whiteTile' : 'blackTile';
+    var colorCode = (parseInt(props.rank) % 2 + (props.file.toLowerCase().charCodeAt(0) - 96) % 2) % 2;
+    var tileStyle = colorCode ? 'whiteTile' : 'blackTile';
     return(
-    <div style={{display: 'inline-block'}} className={tileStyle} onClick={() => setClickStatus(!clickStatus)}>
-        {<span className={'tile ' + props.file + ' _' + props.rank + ' ' + (clickStatus ? "clicked" : "")}>
-            {props.children}
-        </span>}
-    </div>
+        <div className={"tile " + tileStyle + ' ' + (clickStatus ? "clicked" : "")} onClick={() => setClickStatus(!clickStatus)}>
+            {<span className={props.file + ' _' + props.rank}>
+                {props.piece ? <Piece {...props.piece} /> : <></>}
+            </span>}
+        </div>
     );
 }

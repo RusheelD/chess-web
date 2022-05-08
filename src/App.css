@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: lightgray;
 }
 
 .piece-holder {
@@ -7,9 +8,18 @@
   background-color: white;
   border: 2px solid black;
   padding: 2px;
+  margin: 5px;
 }
 
-.App-logo {
+.big-piece {
+  --piece-scale: 1;
+}
+
+.small-piece {
+  --piece-scale: 0.3;
+}
+
+/* .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
@@ -42,4 +52,4 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */

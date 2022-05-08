@@ -1,12 +1,8 @@
-:root {
-    --piece-scale: 0.5;
-}
-
 .piece {
     display: inline-block;
     background: url(./pieces.png);
-    width: calc(200px * var(--piece-scale));
-    height: calc(200px * var(--piece-scale));
+    width: calc(var(--piece-width) * var(--piece-scale));
+    height: calc(var(--piece-height) * var(--piece-scale));
     background-position-x: 0;
     background-position-y: 0;
     background-size: calc(1200px * var(--piece-scale)) calc(400px * var(--piece-scale));
