@@ -32,8 +32,9 @@ export function Board(props: BoardProps) {
             }
             tiles.push(<Tile rank={rank} file={file} piece={child ? child.props : null }/>);
         }
-        rows.push(<div style={{display:'inline-block'}} className={'row'} children={tiles}></div>);
+        
+        rows.push(<div style={{width: 'fit-content'}} className={'row'} children={tiles}></div>);
     }
-    var div = React.createElement('div', {display: 'inline-block'}, [props.children, rows])
+    var div = React.createElement('div', {display: 'inline-block', className: 'board'}, [props.children, rows])
     return(div);
 }

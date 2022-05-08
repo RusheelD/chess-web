@@ -9,7 +9,7 @@
 }
 
 .black {
-    background-position-y: calc(-200px * var(--piece-scale));
+    background-position-y: calc(-1 * var(--piece-height) * var(--piece-scale));
 }
 
 .white {
@@ -21,21 +21,21 @@
 }
 
 .queen {
-    background-position-x: calc(-200px * var(--piece-scale));
+    background-position-x: calc(-1 * var(--piece-width) * var(--piece-scale));
 }
 
 .bishop {
-    background-position-x: calc(-400px * var(--piece-scale));
+    background-position-x: calc(-2 * var(--piece-width) * var(--piece-scale));
 }
 
 .knight {
-    background-position-x: calc(-600px * var(--piece-scale));
+    background-position-x: calc(-3 * var(--piece-width) * var(--piece-scale));
 }
 
 .rook {
-    background-position-x: calc(-800px * var(--piece-scale));
+    background-position-x: calc(-4 * var(--piece-width) * var(--piece-scale));
 }
 
 .pawn {
-    background-position-x: calc(-1000px * var(--piece-scale));
+    background-position-x: calc(-5 * var(--piece-width) * var(--piece-scale));
 }

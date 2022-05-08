@@ -7,9 +7,9 @@
     border-bottom-width: 4px;
     border-left-width: 2px;
     border-right-width: 2px; */
-    /* margin-left: 2px;
-    margin-bottom: 2px; */
-    border: 2px solid black;
+    /* margin-left: 3px;
+    margin-bottom: 3px; */
+    border: 2px solid rgb(50, 50, 50);
 }
 
 .tile > span {
