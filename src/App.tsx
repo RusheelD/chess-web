@@ -22,21 +22,7 @@ function App() {
       </div>
       <div style={{ height: "20px" }} />
 
-      <Tile rank='1' file='a' piece={{color: "black", name: "king"}} />
-
-      {/* <Tile rank='1' file='a'>
-        <Piece color='black' name='king' />
-      </Tile>
-      <Tile rank='1' file='b'>
-        <Piece color='white' name='king' />
-      </Tile>
-      <Tile rank='1' file='c' children={null}/>
-      <Tile rank='1' file='d' >
-        <Piece color='white' name='rook' />
-      </Tile>
-      <Tile rank='1' file='e'>
-        <Piece color='black' name='queen'/>
-      </Tile> */}
+      <Tile rank='1' file='a' piece={{color: "black", name: "king"}} isSelected={false} />
 
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />

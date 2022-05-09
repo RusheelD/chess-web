@@ -1,6 +1,5 @@
 // Defines the core models for chess web
 
-import { BoardProps } from "../components/boards/Board";
 import { gameClient } from "./gameClient";
 
 export interface PieceInfo {
@@ -12,12 +11,13 @@ export interface TileInfo {
     rank: string;
     file: string;
     piece?: PieceInfo;
-    isSelected?: boolean;
+    isSelected: boolean;
 }
 
-export interface Board {
-    tiles: TileInfo[];
+export interface BoardInfo {
+    tiles: Map<string, TileInfo>;
     pieces: PieceInfo[];
+    isFlipped: boolean;
     selectedTile?: TileInfo;
 }
 
@@ -43,7 +43,7 @@ export interface ChessGame {
 
 export interface GameContext {
     game: ChessGame;
-    board: Board;
+    board: BoardInfo;
 }
 
 export interface UserContext {
