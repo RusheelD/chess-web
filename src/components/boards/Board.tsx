@@ -1,11 +1,12 @@
 import React from 'react';
-import { PieceInfo } from '../../models';
+import { PieceInfo, TileInfo } from '../../models';
 import { Piece } from '../pieces/Piece';
 import { Tile } from '../tiles/Tile'
 import './Board.css';
 import {default as pieces} from "./initial.json";
 
 export interface BoardProps {
+    tiles: TileInfo[];
 }
 
 export function Board(props: BoardProps) {

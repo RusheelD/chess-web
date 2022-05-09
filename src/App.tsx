@@ -4,6 +4,7 @@ import './App.css';
 import { Piece } from './components/pieces/Piece';
 import { Tile } from './components/tiles/Tile';
 import { Board } from './components/boards/Board'
+import { userContext } from './models';
 
 function App() {
   return (
@@ -53,7 +54,9 @@ function App() {
       </header> */}
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
-      <Board/>
+
+      <div>Game board start here</div>
+      {userContext.gameContext ? <Board {...userContext.gameContext.board} /> : null}
       <div style={{height: '50px'}}/>
       <div/>
     </div>

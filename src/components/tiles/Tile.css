@@ -9,7 +9,7 @@
     border-right-width: 2px; */
     /* margin-left: 3px;
     margin-bottom: 3px; */
-    border: 2px solid rgb(50, 50, 50);
+    /* border: 2px solid rgb(50, 50, 50); */
 }
 
 .tile > span {
@@ -23,7 +23,7 @@
 }
 
 .blackTile {
-    background-color: rgb(100, 100, 100);
+    background-color: rgb(75, 75, 75);
 }
 
 .clicked {
