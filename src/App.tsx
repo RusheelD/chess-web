@@ -53,7 +53,7 @@ function App() {
       </header> */}
 
       <p>Some pieces are: <Piece name='queen' color='black' /> </p>
-      <Board children={null}/>
+      <Board/>
       <div style={{height: '50px'}}/>
       <div/>
     </div>

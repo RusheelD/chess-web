@@ -6,7 +6,6 @@ import './Board.css';
 import {default as pieces} from "./initial.json";
 
 export interface BoardProps {
-    children:any;
 }
 
 export function Board(props: BoardProps) {
@@ -36,6 +35,6 @@ export function Board(props: BoardProps) {
         
         rows.push(<div style={{width: 'fit-content'}} className={'row'} children={tiles}></div>);
     }
-    var div = React.createElement('div', {display: 'inline-block', className: 'board'}, [props.children, rows])
+    var div = React.createElement('div', {display: 'inline-block', className: 'board'}, rows)
     return(div);
 }

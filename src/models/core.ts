@@ -5,6 +5,12 @@ export interface PieceInfo {
     name: string;
 }
 
+export interface TileInfo {
+    rank: string;
+    file: string;
+    piece?: PieceInfo;
+}
+
 export interface Move {
     from: string;   // Is in the form a1 or a8
     to: string;     // is in the form b2 or c7
@@ -19,7 +25,7 @@ export interface Player {
     isComputer: boolean;
 }
 
-export interface IChessGame {
+export interface ChessGame {
     moves: Move[];  // all the moves made so far in the game
     firstPlayer: Player;
     secondPlayer: Player;
