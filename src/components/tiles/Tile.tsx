@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Piece, PieceProps } from '../pieces/Piece';
+import { PieceInfo } from '../../models';
+import { Piece } from '../pieces/Piece';
 import './Tile.css';
 
 export interface TileProps {
     rank: string;
     file: string;
-    piece?: PieceProps;
+    piece?: PieceInfo;
 }
 
 export function Tile(props: TileProps) {

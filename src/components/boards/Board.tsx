@@ -1,5 +1,6 @@
 import React from 'react';
-import { Piece, PieceProps } from '../pieces/Piece';
+import { PieceInfo } from '../../models';
+import { Piece } from '../pieces/Piece';
 import { Tile } from '../tiles/Tile'
 import './Board.css';
 import {default as pieces} from "./initial.json";
@@ -9,7 +10,7 @@ export interface BoardProps {
 }
 
 export function Board(props: BoardProps) {
-    var pieceMap = new Map<string, PieceProps>(Object.entries(pieces));
+    var pieceMap = new Map<string, PieceInfo>(Object.entries(pieces));
     /*return(
         <div style={{display: 'inline-block'}}>
             {[...Array(8)].map((x, i) => 

@@ -1,10 +1,6 @@
+import { PieceInfo } from '../../models';
 import './Piece.css';
 
-export interface PieceProps {
-    color: string;
-    name: string;
-}
-
-export const Piece = (props: PieceProps) => (
+export const Piece = (props: PieceInfo) => (
     <span className={'piece ' + props.color + ' ' + props.name} />
 );
