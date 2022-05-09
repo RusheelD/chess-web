@@ -6,7 +6,7 @@ function initializeBoard(): BoardInfo {
     var tiles: Map<string, TileInfo> = new Map<string, TileInfo>();
     var pieces: PieceInfo[] = [];
 
-    for (let file of [...Array(8)].map((y, k) => String.fromCharCode(k + 97))) {
+    for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
         for (let rank = 1; rank <= 8; rank++) {
             var tile = file + rank;
 
@@ -41,7 +41,7 @@ function initializeBoard(): BoardInfo {
 }
 
 function initialize(): UserContext {
-    const userContext: UserContext = {
+    const newUserContext: UserContext = {
         gameContext: {
             game: {
                 moves: [],
@@ -60,7 +60,7 @@ function initialize(): UserContext {
         }
     }
 
-    return userContext;
+    return newUserContext;
 }
 
 export const userContext = initialize();
