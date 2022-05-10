@@ -1,19 +1,10 @@
 .tile {
     display: inline-block;
-
-    /* border-style: solid;
-    border-color: black;
-    border-top-width: 4px;
-    border-bottom-width: 4px;
-    border-left-width: 2px;
-    border-right-width: 2px; */
-    /* margin-left: 3px;
-    margin-bottom: 3px; */
-    /* border: 2px solid rgb(50, 50, 50); */
 }
 
 .tile > span {
     display: inline-block;
+    vertical-align: bottom;
     width: calc(var(--piece-width) * var(--piece-scale));
     height: calc(var(--piece-height) * var(--piece-scale));
 }
@@ -33,27 +24,3 @@
 .possible {
     background-color: rgba(255, 255, 0, 0.5);
 }
-
-/* .a {
-    border-left-style: solid;
-    border-left-color: black;
-    border-left-width: 8px;
-}
-
-.h {
-    border-right-style: solid;
-    border-right-color: black;
-    border-right-width: 8px;
-}
-
-._1 {
-    border-bottom-style: solid;
-    border-bottom-color: black;
-    border-bottom-width: 8px;
-}
-
-._8 {
-    border-top-style: solid;
-    border-top-color: black;
-    border-top-width: 8px;
-} */

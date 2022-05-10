@@ -1,6 +1,17 @@
 // Defines the core models for chess web
 
-import { gameClient } from "./gameClient";
+import { GameClient } from "./gameClient";
+
+export enum PlayMode {
+    PassAndPlay,
+    Network,
+    WithComputer,
+}
+
+export enum GameMode {
+    Classic,
+    Synchronic
+}
 
 export interface PieceInfo {
     color: string;
@@ -36,6 +47,7 @@ export interface Player {
 }
 
 export interface ChessGame {
+    mode?: GameMode;
     moves: Move[];  // all the moves made so far in the game
     firstPlayer: Player;
     secondPlayer: Player;
@@ -44,10 +56,20 @@ export interface ChessGame {
 export interface GameContext {
     game: ChessGame;
     board: BoardInfo;
+    playMode: PlayMode;
 }
 
 export interface UserContext {
     gameContext?: GameContext;
-    gameClient?: gameClient;
+    gameClient?: GameClient;
+    enableTestMode: boolean;
 }
 
+export interface BoardProps extends BoardInfo {
+    gameClient?: GameClient;
+    onSelectTile(tile: TileInfo): void;
+}
+
+export interface TileProps extends TileInfo {
+    onSelect(): void;
+}

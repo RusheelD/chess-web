@@ -1,5 +1,6 @@
 :root {
-  --piece-scale: 0.48;
+  /* --piece-scale: calc((attr(body.width) - 20px) / 8 / 200); */
+  --piece-scale: 0.5;
   --piece-height: 200px;
   --piece-width: 200px;
 }
@@ -17,3 +18,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* @media only screen and (min-width: 330px) {
+  :root {
+    --piece-scale: 0.2;
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  :root {
+    --piece-scale: 0.3;
+  }
+}
+
+@media only screen and (min-width: 810px)  {
+  :root {
+    --piece-scale: 0.5
+  }
+} */

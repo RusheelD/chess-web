@@ -1,5 +1,6 @@
-import { BoardInfo, PieceInfo, TileInfo, UserContext } from "./core";
-import { default as piecePositions } from "../components/boards/initial.json";
+import { BoardInfo, PieceInfo, PlayMode, TileInfo, UserContext } from "./core";
+import { GameClient } from "./gameClient";
+import { default as piecePositions } from "./initial.json";
 
 function initializeBoard(): BoardInfo {
     var pieceMap = new Map<string, PieceInfo>(Object.entries(piecePositions));
@@ -42,7 +43,9 @@ function initializeBoard(): BoardInfo {
 
 function initialize(): UserContext {
     const newUserContext: UserContext = {
+        enableTestMode: false,
         gameContext: {
+            playMode: PlayMode.PassAndPlay,
             game: {
                 moves: [],
                 firstPlayer: {
@@ -57,9 +60,10 @@ function initialize(): UserContext {
                 }
             },
             board: initializeBoard()
-        }
+        },
     }
 
+    newUserContext.gameClient = new GameClient(newUserContext.gameContext!);
     return newUserContext;
 }
 
