@@ -3,6 +3,20 @@
   background-color: white;
 }
 
+.App-header {
+  background-color: #282c34;
+  display: flex;
+  padding-right: 20px;
+  flex-direction: column;
+  text-align: right;
+  align-items: right;
+  justify-content: right;
+  font-size: calc(10px + 2vmin);
+  height: calc(30px + 2vmin);
+  vertical-align: middle;
+  color: white;
+}
+
 /* .App-logo {
   height: 40vmin;
   pointer-events: none;

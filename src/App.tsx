@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
-import './App.css';
 import { Board } from './components/boards/Board'
-import { userContext } from './models';
+import { GameClient, userContext } from './models';
 import { Play } from './Play';
 
+import './App.css';
+
 function App() {
+  const [currentPlayer, setCurrentPlayer] = useState(userContext.gameContext?.playerToPlay);
   const [board, setBoard] = useState(userContext.gameContext ? userContext.gameContext.board : null);
+
+  useEffect(() => {
+    function updateCurrentPlayer() {
+      setCurrentPlayer(userContext.gameContext?.playerToPlay);
+    }
+
+    if (userContext.gameClient) {
+      userContext.gameClient.setPlayerTurnChangeHandler(updateCurrentPlayer);
+    }
+  });
 
   useEffect(() => {
     function updateBoard() {
@@ -19,6 +31,11 @@ function App() {
   
   return (
     <div className="App">
+      <div className="App-header">{userContext.user.name + " (" + userContext.user.id + ")"}</div>
+      <div>
+        Next player to play: {currentPlayer?.user?.name} <br />
+        Color: {currentPlayer?.colorChosen}
+      </div>
       {userContext.enableTestMode ? <Play /> : null}
       {
         (userContext.gameContext && board)

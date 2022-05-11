@@ -40,8 +40,13 @@ export interface Move {
     isCheckMate: boolean;
 }
 
-export interface Player {
+export interface User {
+    id: string;
     name: string;
+}
+
+export interface Player {
+    user?: User;
     colorChosen: string;
     isComputer: boolean;
 }
@@ -57,9 +62,11 @@ export interface GameContext {
     game: ChessGame;
     board: BoardInfo;
     playMode: PlayMode;
+    playerToPlay: Player;
 }
 
 export interface UserContext {
+    user: User;
     gameContext?: GameContext;
     gameClient?: GameClient;
     enableTestMode: boolean;
