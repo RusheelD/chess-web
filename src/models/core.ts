@@ -23,6 +23,8 @@ export interface TileInfo {
     file: string;
     piece?: PieceInfo;
     isSelected: boolean;
+    isRecentlyMoved: boolean;
+    isPossibleMove: boolean;
 }
 
 export interface BoardInfo {
@@ -30,6 +32,7 @@ export interface BoardInfo {
     pieces: PieceInfo[];
     isFlipped: boolean;
     selectedTile?: TileInfo;
+    recentMoves: TileInfo[];
 }
 
 export interface Move {

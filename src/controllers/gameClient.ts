@@ -111,18 +111,27 @@ export class GameClient {
     }
 
     movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {
-        targetTile.piece = selectedTile.piece;
-        selectedTile.piece = undefined;
+        // Clear the previous moves
+        for (let tile of this.gameContext.board.recentMoves) {
+            tile.isRecentlyMoved = false;
+        }
 
+        targetTile.piece = selectedTile.piece;
+        targetTile.isRecentlyMoved = true;
+        selectedTile.piece = undefined;
+        selectedTile.isRecentlyMoved = true;
+
+        this.gameContext.board.recentMoves = [selectedTile, targetTile];
         return [selectedTile, targetTile];
     }
 
     isValidMove(selectedTile: TileInfo, targetTile: TileInfo): boolean {
-        if (selectedTile && selectedTile.piece && targetTile && targetTile.piece && targetTile.piece.color !== selectedTile.piece.color) {
-            return true;
-        }
+        return true;
+        // if (selectedTile && selectedTile.piece && targetTile && targetTile.piece && targetTile.piece.color !== selectedTile.piece.color) {
+        //     return true;
+        // }
 
-        return false;
+        // return false;
     }
 
     // Update handlers

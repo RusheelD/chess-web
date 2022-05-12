@@ -22,12 +22,16 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
                     file,
                     piece,
                     isSelected: false,
+                    isRecentlyMoved: false,
+                    isPossibleMove: false,
                 });
             } else {
                 tiles.set(tile, {
                     file,
                     rank: rank.toString(),
                     isSelected: false,
+                    isRecentlyMoved: false,
+                    isPossibleMove: false
                 });
             }
         }
@@ -37,7 +41,8 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
         tiles: tiles,
         pieces: pieces,
         isFlipped,
-        selectedTile: undefined
+        selectedTile: undefined,
+        recentMoves: []
     };
 }
 

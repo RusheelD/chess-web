@@ -20,7 +20,11 @@ export function Play() {
             </div>
             <div style={{ height: "20px" }} />
 
-            <Tile rank='1' file='a' piece={{ color: "black", name: "king" }} isSelected={false} onSelect={() => {
+            <Tile rank='1' file='a' piece={{ color: "black", name: "king" }}
+                isSelected={false}
+                isRecentlyMoved={false}
+                isPossibleMove={false}
+                onSelect={() => {
                 console.log('Clicked a tile!!');
             }} />
 
