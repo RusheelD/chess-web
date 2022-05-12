@@ -1,6 +1,6 @@
 :root {
   /* --piece-scale: calc((attr(body.width) - 20px) / 8 / 200); */
-  --piece-scale: 0.5;
+  --piece-scale: 0.4;
   --piece-height: 200px;
   --piece-width: 200px;
 }

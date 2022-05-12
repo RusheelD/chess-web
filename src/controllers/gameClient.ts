@@ -143,6 +143,9 @@ export class GameClient {
         let enpassantKill = checkEnpassantKillAndGetDeadTile(this.gameContext.game, this.gameContext.board, selectedTile, targetTile);
         if (enpassantKill && enpassantKill.piece) {
             enpassantKill.piece.isDead = true;
+            enpassantKill.piece.color === "white" 
+            ? this.gameContext.board.deadWhite.pieces.push(enpassantKill.piece) 
+            : this.gameContext.board.deadBlack.pieces.push(enpassantKill.piece);
             enpassantKill.piece.currentTile = undefined;
             enpassantKill.piece = undefined;
             changedTiles.push(enpassantKill);
@@ -152,6 +155,9 @@ export class GameClient {
         selectedTile.piece!.moveCount! += 1;
         if (targetTile.piece) {
             targetTile.piece.isDead = true;
+            targetTile.piece.color === "white" 
+            ? this.gameContext.board.deadWhite.pieces.push(targetTile.piece) 
+            : this.gameContext.board.deadBlack.pieces.push(targetTile.piece);
             targetTile.piece.currentTile = undefined;
         }
         targetTile.piece = selectedTile.piece;

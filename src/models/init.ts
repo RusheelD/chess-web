@@ -46,7 +46,15 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
         isFlipped,
         selectedTile: undefined,
         recentMoves: [],
-        possibleMoves: []
+        possibleMoves: [],
+        deadWhite: {
+            color: "white",
+            pieces: []
+        },
+        deadBlack: {
+            color: "black",
+            pieces: []
+        }
     };
 }
 

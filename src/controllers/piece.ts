@@ -1,4 +1,3 @@
-import { sign } from "crypto";
 import { BoardInfo, ChessGame, TileInfo } from "../models";
 
 const bounds = {

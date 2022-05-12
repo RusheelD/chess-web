@@ -37,6 +37,13 @@ export interface BoardInfo {
     selectedTile?: TileInfo;
     recentMoves: TileInfo[];
     possibleMoves: TileInfo[];
+    deadBlack: DeadInfo;
+    deadWhite: DeadInfo;
+}
+
+export interface DeadInfo {
+    color: string;
+    pieces: PieceInfo[];
 }
 
 export interface Move {

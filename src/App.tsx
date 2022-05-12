@@ -4,6 +4,7 @@ import { userContext } from './models';
 import { Play } from './Play';
 
 import './App.css';
+import { DeadPieces } from './components/dead-pieces/DeadPieces';
 
 function App() {
   const [currentPlayer, setCurrentPlayer] = useState(userContext.gameContext?.playerToPlay);
@@ -44,6 +45,14 @@ function App() {
             gameClient={userContext.gameClient}
             onSelectTile ={userContext.gameClient!.handleSelectTile.bind(userContext.gameClient!)} />
          : undefined}
+      <div>
+        {
+          board ? <DeadPieces {...board.deadWhite} /> : undefined
+        }
+        {
+          board ? <DeadPieces {...board.deadBlack} /> : undefined
+        }
+      </div>
     </div>
   );
 }

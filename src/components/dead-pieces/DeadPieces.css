@@ -1,0 +1,15 @@
+.dead {
+    --piece-scale: 0.2;
+    display: inline-block;
+    border: 2px solid black;
+    margin-top: 5px;
+    margin-left: 2px;
+    margin-right: 2px;
+    max-width: calc(var(--piece-scale) * var());
+}
+.white {
+    text-align: left;
+}
+.black {
+    text-align: right;
+}
