@@ -4,6 +4,10 @@ Let's Chess! on the web ...
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Update log
+
+A lot of cool new features are added .. check 'em out ...
+
 ## Available Scripts
 
 In the project directory, you can run:
