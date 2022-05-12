@@ -9,18 +9,18 @@ export function Play() {
         <div>
             <div>
                 <div className='piece-holder'>
-                    <Piece name='queen' color='black' />
+                    <Piece name='queen' color='black' moveCount={0} isDead={false} />
                 </div>
                 <div className='piece-holder big-piece'>
-                    <Piece name='queen' color='black' />
+                    <Piece name='queen' color='black' moveCount={0} isDead={false} />
                 </div>
                 <div className='piece-holder small-piece'>
-                    <Piece name='queen' color='black' />
+                    <Piece name='queen' color='black' moveCount={0} isDead={false} />
                 </div>
             </div>
             <div style={{ height: "20px" }} />
 
-            <Tile rank='1' file='a' piece={{ color: "black", name: "king" }}
+            <Tile rank='1' file='a' piece={{ color: "black", name: "king", moveCount: 0, isDead: false }}
                 isSelected={false}
                 isRecentlyMoved={false}
                 isPossibleMove={false}
@@ -43,7 +43,7 @@ export function Play() {
                 </a>
             </header> */}
 
-            <p>Some pieces are: <Piece name='queen' color='black' /> </p>
+            <p>Some pieces are: <Piece name='queen' color='black' moveCount={0} isDead={false} /> </p>
             <div>Test mode ends here and the actual app starts here</div>
             <hr />
         </div>

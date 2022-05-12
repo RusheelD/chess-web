@@ -16,7 +16,9 @@ export enum GameMode {
 export interface PieceInfo {
     color: string;
     name: string;
-    moveCount?: number;
+    isDead: boolean;
+    moveCount: number;
+    currentTile?: TileInfo;
 }
 
 export interface TileInfo {

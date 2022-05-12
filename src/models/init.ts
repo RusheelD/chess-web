@@ -3,7 +3,7 @@ import { GameClient } from "../controllers";
 import { default as piecePositions } from "./initial.json";
 
 function initializeBoard(isFlipped: boolean): BoardInfo {
-    var pieceMap = new Map<string, PieceInfo>(Object.entries(piecePositions));
+    var pieceMap = new Map<string, { color: string, name: string }>(Object.entries(piecePositions));
     var tiles: Map<string, TileInfo> = new Map<string, TileInfo>();
     var pieces: PieceInfo[] = [];
 
@@ -14,7 +14,8 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
             if (pieceMap.has(tile)) {
                 const piece: PieceInfo = {
                     ...pieceMap.get(tile)!,
-                    moveCount: 0
+                    moveCount: 0,
+                    isDead: false,
                 };
 
                 pieces.push(piece);
@@ -26,6 +27,7 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
                     isRecentlyMoved: false,
                     isPossibleMove: false,
                 });
+                piece.currentTile = tiles.get(tile);
             } else {
                 tiles.set(tile, {
                     file,

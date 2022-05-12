@@ -141,15 +141,22 @@ export class GameClient {
 
         // Special kill for enpassant
         let enpassantKill = checkEnpassantKillAndGetDeadTile(this.gameContext.game, this.gameContext.board, selectedTile, targetTile);
-        if (enpassantKill) {
+        if (enpassantKill && enpassantKill.piece) {
+            enpassantKill.piece.isDead = true;
+            enpassantKill.piece.currentTile = undefined;
             enpassantKill.piece = undefined;
             changedTiles.push(enpassantKill);
         }
 
         // Make the move and assign the piece
         selectedTile.piece!.moveCount! += 1;
+        if (targetTile.piece) {
+            targetTile.piece.isDead = true;
+            targetTile.piece.currentTile = undefined;
+        }
         targetTile.piece = selectedTile.piece;
         targetTile.isRecentlyMoved = true;
+        targetTile.piece!.currentTile = targetTile;
         selectedTile.piece = undefined;
         selectedTile.isRecentlyMoved = true;
 
@@ -161,6 +168,7 @@ export class GameClient {
             castle[0].piece = undefined;
             castle[0].isRecentlyMoved = true;
             castle[1].isRecentlyMoved = true;
+            castle[1].piece!.currentTile = castle[1];
             changedTiles.push(...castle);
         }
 
