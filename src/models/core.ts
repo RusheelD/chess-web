@@ -1,6 +1,6 @@
 // Defines the core models for chess web
 
-import { GameClient } from "./gameClient";
+import { GameClient } from "../controllers";
 
 export enum PlayMode {
     PassAndPlay,
@@ -65,6 +65,9 @@ export interface GameContext {
     playerToPlay: Player;
 }
 
+// The following models use game client as properties. THis isn't really a good
+// structure.
+// TODO: Figure out a structure to remove from here and use it directly in the App
 export interface UserContext {
     user: User;
     gameContext?: GameContext;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Board } from './components/boards/Board'
-import { GameClient, userContext } from './models';
+import { userContext } from './models';
 import { Play } from './Play';
 
 import './App.css';
@@ -42,7 +42,7 @@ function App() {
          ? <Board
             {...board}
             gameClient={userContext.gameClient}
-            onSelectTile ={userContext.gameClient!.selectTile.bind(userContext.gameClient!)} />
+            onSelectTile ={userContext.gameClient!.handleSelectTile.bind(userContext.gameClient!)} />
          : undefined}
     </div>
   );

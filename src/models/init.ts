@@ -1,5 +1,5 @@
 import { BoardInfo, ChessGame, GameMode, PieceInfo, PlayMode, TileInfo, User, UserContext } from "./core";
-import { GameClient } from "./gameClient";
+import { GameClient } from "../controllers";
 import { default as piecePositions } from "./initial.json";
 
 function initializeBoard(isFlipped: boolean): BoardInfo {
