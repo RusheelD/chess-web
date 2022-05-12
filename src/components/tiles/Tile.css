@@ -21,10 +21,10 @@
     background-color: rgb(0, 175, 0);
 }
 
-.possible {
-    background-color: rgba(255, 255, 50, .6);
-}
-
 .recentlyMoved {
     background-color: rgba(100, 255, 255, 0.2);
+}
+
+.possible {
+    background-color: rgba(255, 255, 50, .6);
 }

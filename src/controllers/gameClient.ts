@@ -1,5 +1,6 @@
 import { GameContext, Move, TileInfo } from "../models/core";
 import { log } from "../utils";
+import { checkCastleAndGetRook, checkEnpassantKillAndGetDeadTile, pieceControllers } from "./piece";
 
 export class GameClient {
     gameContext: GameContext;
@@ -48,7 +49,7 @@ export class GameClient {
         }
 
         // Handle moving pieces now
-        if (this.isValidMove(selectedTile!, tile)) {
+        if (this.isValidMove(tile)) {
             tilesToUpdate.push(...this.movePiece(selectedTile!, tile));
             tilesToUpdate.push(...this.unselectTile());
             this.updateTilesOnBoard(tilesToUpdate, true, this.gameContext.board.selectedTile);
@@ -92,6 +93,13 @@ export class GameClient {
     unselectTile(): TileInfo[] {
         let changedTiles: TileInfo[] = [];
 
+        for (let tile of this.gameContext.board.possibleMoves) {
+            tile.isPossibleMove = false;
+            changedTiles.push(tile);
+        }
+
+        this.gameContext.board.possibleMoves = [];
+
         if (this.gameContext.board.selectedTile) {
             changedTiles.push(this.gameContext.board.selectedTile);
             this.gameContext.board.selectedTile.isSelected = false;
@@ -108,32 +116,69 @@ export class GameClient {
         tile.isSelected = true;
         this.gameContext.board.selectedTile = tile;
 
+        // Compute valid moves
+        const pieceController = pieceControllers.get(tile.piece!.name);
+        let validMoves = pieceController
+            ? pieceController.computeValidMoves(this.gameContext.game, this.gameContext.board, tile)
+            : [];
+
+        for (let moveTile of validMoves) {
+            moveTile.isPossibleMove = true;
+            changedTiles.push(moveTile);
+        }
+
+        this.gameContext.board.possibleMoves = validMoves;
         return changedTiles;
     }
 
     movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {
+        let changedTiles: TileInfo[] = [];
+
         // Clear the previous moves
         for (let tile of this.gameContext.board.recentMoves) {
             tile.isRecentlyMoved = false;
         }
 
+        // Special kill for enpassant
+        let enpassantKill = checkEnpassantKillAndGetDeadTile(this.gameContext.game, this.gameContext.board, selectedTile, targetTile);
+        if (enpassantKill) {
+            enpassantKill.piece = undefined;
+            changedTiles.push(enpassantKill);
+        }
+
+        // Make the move and assign the piece
+        selectedTile.piece!.moveCount! += 1;
         targetTile.piece = selectedTile.piece;
         targetTile.isRecentlyMoved = true;
         selectedTile.piece = undefined;
         selectedTile.isRecentlyMoved = true;
 
+        // Special move for castling
+        let castle = checkCastleAndGetRook(this.gameContext.board, selectedTile, targetTile);
+        if (castle) {
+            castle[1].piece = castle[0].piece!;
+            castle[0].piece!.moveCount! += 1;
+            castle[0].piece = undefined;
+            castle[0].isRecentlyMoved = true;
+            castle[1].isRecentlyMoved = true;
+            changedTiles.push(...castle);
+        }
+
         this.addMoveToGame(selectedTile, targetTile);
         this.gameContext.board.recentMoves = [selectedTile, targetTile];
-        return [selectedTile, targetTile];
+        changedTiles.push(selectedTile, targetTile);
+
+        return changedTiles;
     }
 
-    isValidMove(selectedTile: TileInfo, targetTile: TileInfo): boolean {
-        return true;
-        // if (selectedTile && selectedTile.piece && targetTile && targetTile.piece && targetTile.piece.color !== selectedTile.piece.color) {
-        //     return true;
-        // }
+    isValidMove(targetTile: TileInfo): boolean {
+        for (let tile of this.gameContext.board.possibleMoves) {
+            if (tile === targetTile) {
+                return true;
+            }
+        }
 
-        // return false;
+        return false;
     }
 
     // Update handlers

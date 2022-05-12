@@ -13,7 +13,8 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
 
             if (pieceMap.has(tile)) {
                 const piece: PieceInfo = {
-                    ...pieceMap.get(tile)!
+                    ...pieceMap.get(tile)!,
+                    moveCount: 0
                 };
 
                 pieces.push(piece);
@@ -42,7 +43,8 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
         pieces: pieces,
         isFlipped,
         selectedTile: undefined,
-        recentMoves: []
+        recentMoves: [],
+        possibleMoves: []
     };
 }
 

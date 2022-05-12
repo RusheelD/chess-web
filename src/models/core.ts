@@ -16,6 +16,7 @@ export enum GameMode {
 export interface PieceInfo {
     color: string;
     name: string;
+    moveCount?: number;
 }
 
 export interface TileInfo {
@@ -33,6 +34,7 @@ export interface BoardInfo {
     isFlipped: boolean;
     selectedTile?: TileInfo;
     recentMoves: TileInfo[];
+    possibleMoves: TileInfo[];
 }
 
 export interface Move {
