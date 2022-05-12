@@ -38,6 +38,7 @@ export interface BoardInfo {
 export interface Move {
     from: string;   // Is in the form a1 or a8
     to: string;     // is in the form b2 or c7
+    piece: PieceInfo;
     isCheck: boolean;
     isCastling: boolean;
     isCheckMate: boolean;

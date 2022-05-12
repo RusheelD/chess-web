@@ -1,4 +1,5 @@
-import { GameContext, TileInfo } from "../models/core";
+import { GameContext, Move, TileInfo } from "../models/core";
+import { log } from "../utils";
 
 export class GameClient {
     gameContext: GameContext;
@@ -121,6 +122,7 @@ export class GameClient {
         selectedTile.piece = undefined;
         selectedTile.isRecentlyMoved = true;
 
+        this.addMoveToGame(selectedTile, targetTile);
         this.gameContext.board.recentMoves = [selectedTile, targetTile];
         return [selectedTile, targetTile];
     }
@@ -141,5 +143,20 @@ export class GameClient {
 
     setBoardUpdateHandler(handler: () => void) {
         this.updateCallback = handler;
+    }
+
+    // Update game objects
+    addMoveToGame(fromTile: TileInfo, toTile: TileInfo) {
+        const move: Move = {
+            from: fromTile.file + fromTile.rank,
+            to: toTile.file + toTile.rank,
+            piece: toTile.piece!,
+            isCheck: false,
+            isCastling: false,
+            isCheckMate: false
+        }
+
+        log(move);
+        this.gameContext.game.moves.push(move);
     }
 }
