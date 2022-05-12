@@ -165,7 +165,7 @@ export class GameClient {
         }
 
         this.addMoveToGame(selectedTile, targetTile);
-        this.gameContext.board.recentMoves = [selectedTile, targetTile];
+        this.gameContext.board.recentMoves = [selectedTile, targetTile, ...(castle ? castle : [])];
         changedTiles.push(selectedTile, targetTile);
 
         return changedTiles;
