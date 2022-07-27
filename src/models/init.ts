@@ -3,13 +3,13 @@ import { GameClient } from "../controllers";
 import { default as piecePositions } from "./initial.json";
 
 function initializeBoard(isFlipped: boolean): BoardInfo {
-    var pieceMap = new Map<string, { color: string, name: string }>(Object.entries(piecePositions));
-    var tiles: Map<string, TileInfo> = new Map<string, TileInfo>();
-    var pieces: PieceInfo[] = [];
+    let pieceMap = new Map<string, { color: string, name: string }>(Object.entries(piecePositions));
+    let tiles: Map<string, TileInfo> = new Map<string, TileInfo>();
+    let pieces: PieceInfo[] = [];
 
     for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
         for (let rank = 1; rank <= 8; rank++) {
-            var tile = file + rank;
+            let tile = file + rank;
 
             if (pieceMap.has(tile)) {
                 const piece: PieceInfo = {
