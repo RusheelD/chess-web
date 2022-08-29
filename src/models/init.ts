@@ -2,8 +2,47 @@ import { BoardInfo, ChessGame, GameMode, PieceInfo, PlayMode, TileInfo, User, Us
 import { GameClient } from "../controllers";
 import { default as piecePositions } from "./initial.json";
 
+function fromFen(fen: string): Map<string, { color: string, name: string }> {
+    const map: Map<string, { color: string, name: string }> = new Map();
+    let rows = fen.split('/', 8);
+    for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
+        for (let j = 0; j < row.length; j++) {
+            if(row.charCodeAt(j) <= 56) {
+                continue;
+            }
+            let color = row.charCodeAt(j)<94 ? "white" : "black";
+            let name;
+            switch (row.charAt(j).toLowerCase()) {
+                case 'p' : name = "pawn"; break;
+                case 'n' : name = "knight"; break;
+                case 'b' : name = "bishop"; break;
+                case 'r' : name = "rook"; break;
+                case 'q' : name = "queen"; break;
+                case 'k' : name = "king"; break;
+                default: name = "pawn"; break;
+            }
+            map.set(String.fromCharCode(104-i)+(j+1), {color: color, name: name});
+        }
+    }
+    return map;
+}
+
 function initializeBoard(isFlipped: boolean): BoardInfo {
-    let pieceMap = new Map<string, { color: string, name: string }>(Object.entries(piecePositions));
+    let data = {
+        fen: ""
+    };
+    let pieceMap = new Map();
+    fetch("/game").then((res) =>
+          res.json().then((raw_data) => {
+              // Setting a data from api
+              data.fen = raw_data.board;
+              pieceMap = fromFen(data.fen);
+          })
+      );
+    pieceMap = new Map<string, { color: string, name: string }>(Object.entries(piecePositions));
+    
+    console.log(pieceMap);
     let tiles: Map<string, TileInfo> = new Map<string, TileInfo>();
     let pieces: PieceInfo[] = [];
 

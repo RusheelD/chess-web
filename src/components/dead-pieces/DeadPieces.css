@@ -7,9 +7,15 @@
     margin-right: 2px;
     max-width: calc(var(--piece-scale) * var());
 }
+
 .white {
     text-align: left;
 }
+
 .black {
     text-align: right;
+}
+
+.empty {
+    border: 0px;
 }
