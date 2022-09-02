@@ -1,6 +1,12 @@
 {
-    "cSpell.words": [
-        "pyglet",
-        "setdata"
-    ]
+  "cSpell.words": [
+    "enpassant",
+    "oneplayer",
+    "pyglet",
+    "retstr",
+    "setdata",
+    "twoplayer"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }

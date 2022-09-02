@@ -5,9 +5,10 @@ from Pieces import *
 
 
 class Board(object):
-    
+
     def __init__(self):
-        pieces_images = pyglet.image.load(os.path.relpath("C:/code/github/chess-web/backend/Pieces-Images.png"))
+        pieces_images = pyglet.image.load(os.path.relpath(
+            "C:/code/github/chess-web/backend/Pieces-Images.png"))
 
         Black_King_Image = pieces_images.get_region(0, 0, 200, 200)
         White_King_Image = pieces_images.get_region(0, 200, 200, 200)
@@ -22,38 +23,54 @@ class Board(object):
         Black_Pawn_Image = pieces_images.get_region(1000, 0, 200, 200)
         White_Pawn_Image = pieces_images.get_region(1000, 200, 200, 200)
 
-        self.black_images = [Black_Pawn_Image, Black_Rook_Image, Black_Knight_Image, 
-        Black_Bishop_Image, Black_Queen_Image, Black_King_Image]
+        self.black_images = [Black_Pawn_Image, Black_Rook_Image, Black_Knight_Image,
+                             Black_Bishop_Image, Black_Queen_Image, Black_King_Image]
 
-        self.white_images = [White_Pawn_Image, White_Rook_Image, White_Knight_Image, 
-        White_Bishop_Image, White_Queen_Image, White_King_Image]
+        self.white_images = [White_Pawn_Image, White_Rook_Image, White_Knight_Image,
+                             White_Bishop_Image, White_Queen_Image, White_King_Image]
 
         self.current_turn = 1
         self.moves_made = []
-        self.pieces = [Rook(self.white_images[1], 0, 0, 0, self), Knight(self.white_images[2], 0, 1, 0, self), 
-        Bishop(self.white_images[3], 0, 2, 0, self), Queen(self.white_images[4], 0, 3, 0, self), 
-        King(self.white_images[5], 0, 4, 0, self), Bishop(self.white_images[3], 0, 5, 0, self), 
-        Knight(self.white_images[2], 0, 6, 0, self), Rook(self.white_images[1], 0, 7, 0, self), 
-        Pawn(self.white_images[0], 1, 0, 0, self), Pawn(self.white_images[0], 1, 1, 0, self), 
-        Pawn(self.white_images[0], 1, 2, 0, self), Pawn(self.white_images[0], 1, 3, 0, self), 
-        Pawn(self.white_images[0], 1, 4, 0, self), Pawn(self.white_images[0], 1, 5, 0, self), 
-        Pawn(self.white_images[0], 1, 6, 0, self), Pawn(self.white_images[0], 1, 7, 0, self), 
-        Pawn(self.black_images[0], 6, 0, 1, self), Pawn(self.black_images[0], 6, 1, 1, self), 
-        Pawn(self.black_images[0], 6, 2, 1, self), Pawn(self.black_images[0], 6, 3, 1, self), 
-        Pawn(self.black_images[0], 6, 4, 1, self), Pawn(self.black_images[0], 6, 5, 1, self), 
-        Pawn(self.black_images[0], 6, 6, 1, self), Pawn(self.black_images[0], 6, 7, 1, self), 
-        Rook(self.black_images[1], 7, 0, 1, self), Knight(self.black_images[2], 7, 1, 1, self), 
-        Bishop(self.black_images[3], 7, 2, 1, self), Queen(self.black_images[4], 7, 3, 1, self), 
-        King(self.black_images[5], 7, 4, 1, self), Bishop(self.black_images[3], 7, 5, 1, self), 
-        Knight(self.black_images[2], 7, 6, 1, self), Rook(self.black_images[1], 7, 7, 1, self)]
-        self.grid = [[None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None], 
-        [None, None, None, None, None, None, None, None]]
+        self.dead_white = []
+        self.dead_black = []
+        self.pieces = [Rook(self.white_images[1], 0, 0, 0, self), Knight(self.white_images[2], 0, 1, 0, self),
+                       Bishop(self.white_images[3], 0, 2, 0, self), Queen(
+                           self.white_images[4], 0, 3, 0, self),
+                       King(self.white_images[5], 0, 4, 0, self), Bishop(
+                           self.white_images[3], 0, 5, 0, self),
+                       Knight(self.white_images[2], 0, 6, 0, self), Rook(
+            self.white_images[1], 0, 7, 0, self),
+            Pawn(self.white_images[0], 1, 0, 0, self), Pawn(
+                self.white_images[0], 1, 1, 0, self),
+            Pawn(self.white_images[0], 1, 2, 0, self), Pawn(
+                self.white_images[0], 1, 3, 0, self),
+            Pawn(self.white_images[0], 1, 4, 0, self), Pawn(
+                self.white_images[0], 1, 5, 0, self),
+            Pawn(self.white_images[0], 1, 6, 0, self), Pawn(
+                self.white_images[0], 1, 7, 0, self),
+            Pawn(self.black_images[0], 6, 0, 1, self), Pawn(
+                self.black_images[0], 6, 1, 1, self),
+            Pawn(self.black_images[0], 6, 2, 1, self), Pawn(
+                self.black_images[0], 6, 3, 1, self),
+            Pawn(self.black_images[0], 6, 4, 1, self), Pawn(
+                self.black_images[0], 6, 5, 1, self),
+            Pawn(self.black_images[0], 6, 6, 1, self), Pawn(
+                self.black_images[0], 6, 7, 1, self),
+            Rook(self.black_images[1], 7, 0, 1, self), Knight(
+                self.black_images[2], 7, 1, 1, self),
+            Bishop(self.black_images[3], 7, 2, 1, self), Queen(
+                self.black_images[4], 7, 3, 1, self),
+            King(self.black_images[5], 7, 4, 1, self), Bishop(
+                self.black_images[3], 7, 5, 1, self),
+            Knight(self.black_images[2], 7, 6, 1, self), Rook(self.black_images[1], 7, 7, 1, self)]
+        self.grid = [[None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None, None]]
         self.black_pieces = []
         self.white_pieces = []
         self.refresh_pieces()
@@ -67,7 +84,7 @@ class Board(object):
                 string += "\t" if piece == None else ""
             string += "\n"
         return string
-    
+
     def to_fen(self):
         string = ""
         for i in range(7, -1, -1):
@@ -77,23 +94,34 @@ class Board(object):
                 if piece is None:
                     count += 1
                     continue
-                if(count > 0):
+                if (count > 0):
                     string += str(count)
                     count = 0
-                if(type(piece) == Knight):
+                if (type(piece) == Knight):
                     char += 'n'
                 else:
                     char += str(type(piece)).split('.')[1][0]
-                if(piece.color == 0):
+                if (piece.color == 0):
                     char = char.upper()
                 else:
                     char = char.lower()
                 string += char
-            if(count > 0):
+            if (count > 0):
                 string += str(count)
             string += "/"
         return string[:-1]
-    
+
+    def move_count_fen(self):
+        string = ""
+        for i in range(7, -1, -1):
+            for piece in self.grid[i]:
+                if piece is None:
+                    string += "-,"
+                    continue
+                string += str(piece.steps_taken)+','
+            string = string[:-1]+'/'
+        return string[:-1]
+
     def refresh_pieces(self):
         for row in self.grid:
             for piece in row:
@@ -102,7 +130,7 @@ class Board(object):
         self.white_pieces.clear()
         for piece in self.pieces:
             self.grid[piece.row][piece.column] = piece
-            if(piece.color == 1):
+            if (piece.color == 1):
                 self.black_pieces.append(piece)
             else:
                 self.white_pieces.append(piece)
@@ -116,7 +144,7 @@ class Board(object):
         self.pieces.clear()
         for row in range(len(board.grid)):
             for column in range(len(row)):
-                if(board.grid[row][column] != None):
+                if (board.grid[row][column] != None):
                     self.grid[row][column] = board.grid[row][column].copy()
                     self.pieces.append(self.grid[row][column])
                     self.refresh_pieces()
@@ -129,7 +157,7 @@ class Board(object):
 
     def get_white_king_pos(self):
         return King.White_King_Pos
-    
+
     def get_black_king_pos(self):
         return King.Black_King_Pos
 
@@ -144,12 +172,12 @@ class Board(object):
 
     def white_in_check(self):
         for piece in self.pieces:
-            if(piece.color == 1 and King.White_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 1 and King.White_King_Pos in piece.get_attack_moves()):
                 return True
 
     def black_in_check(self):
         for piece in self.pieces:
-            if(piece.color == 0 and King.Black_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 0 and King.Black_King_Pos in piece.get_attack_moves()):
                 return True
 
     def kings_in_check(self):
@@ -161,8 +189,8 @@ class Board(object):
         for move in piece.valid_moves:
             temp = self.grid[move[0]][move[1]]
             origin = [piece.row, piece.column]
-            piece.move(move[0], move[1], checking = True)
-            if(self.kings_in_check()[piece.color]):
+            piece.move(move[0], move[1], checking=True)
+            if (self.kings_in_check()[piece.color]):
                 invalid_moves.append(move)
             piece.undo_move(origin[0], origin[1], temp)
             self.kings_in_check()[piece.color]
@@ -172,22 +200,36 @@ class Board(object):
     def all_valid_moves(self, color_to_check):
         moves = []
         for piece in self.pieces:
-            if(piece.color == color_to_check):
+            if (piece.color == color_to_check):
                 moves += piece.get_valid_moves()
         return moves
 
     def all_attack_moves(self, color_to_check):
-            moves = []
-            for piece in self.pieces:
-                if(piece.color == color_to_check):
-                    moves += piece.get_attack_moves()
-            return moves
-            
+        moves = []
+        for piece in self.pieces:
+            if (piece.color == color_to_check):
+                moves += piece.get_attack_moves()
+        return moves
+
     def no_valid_moves(self, color_to_move):
         for piece in self.pieces:
-            if(piece.color == color_to_move and len(piece.get_valid_moves()) > 0):
-                return False   
+            if (piece.color == color_to_move and len(piece.get_valid_moves()) > 0):
+                return False
         return True
-    
-b = Board()
-print(b.to_fen())
+
+    def format_valid_moves(self, piece):
+        retstr = ""
+        if (piece is None):
+            return ""
+        for move in piece.get_valid_moves():
+            retstr += chr(move[1] + 97)+str(move[0]+1)+','
+        return retstr[:-1]
+
+    def get_dead(self):
+        white = ""
+        black = ""
+        for piece in self.dead_white:
+            white += str(type(piece)).split('.')[1][0].upper()
+        for piece in self.dead_black:
+            black += str(type(piece)).split('.')[1][0].lower()
+        return [white, black]

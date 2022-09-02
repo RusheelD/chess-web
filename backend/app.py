@@ -10,75 +10,96 @@ app = flask.Flask(__name__)
 
 # AppManager class to contain and handle the details of a specific app and login manager
 # to maintain the state and manage the logic
+
+
 class AppManager():
     def __init__(self, app):
         self.app = app
         self.updated_data = None
+        self.game = None
+
     def updateLogout(self):
-        self.can_logout = not(self.can_logout)
+        self.can_logout = not (self.can_logout)
+
 
 # Initialize the app manager
 app_manager = AppManager(app)
+
 
 @app_manager.app.route('/')
 def i():
     return flask.redirect(flask.url_for('index'))
 
-# Route to index page, 
+# Route to index page,
+
+
 @app_manager.app.route("/index", methods=['GET', 'POST'])
 def index():
-    if(flask.request.method == 'GET'):
-        data = app_manager.updated_data
-        gamemode = ""
-        if(data!=None):
-            chosen = str(data.keys())[2:-2]
-            gamemode = data.to_dict()[chosen]
-        return flask.render_template('index.html', gamemode=gamemode)
-    app_manager.updated_data = flask.request.values
-    return flask.redirect(flask.url_for('redirect'))
-       
-@app_manager.app.route("/redirect")
-def redirect():
-    req=app_manager.updated_data.to_dict()
-    open('output.txt', 'w', encoding='utf-8').write(str(req))
-    flask.request.method = 'GET'
-    return flask.redirect(flask.url_for('index'))
+    return {"status": "OK"}
 
-@app_manager.app.route("/game")
-def game():
-    game = GameControl()
-    return {"board":game.main_board.to_fen()}
+
+@app_manager.app.route("/make", methods=['GET', 'POST'])
+def make():
+    if flask.request.method == 'POST':
+        data = dict(flask.request.json)
+        mode = data.get('mode')
+        if (mode == 'synchronic'):
+            app_manager.game = MultiGameControl()
+        elif (mode == 'oneplayer'):
+            app_manager.game = AIControl()
+        else:
+            app_manager.game = GameControl()
+        return board()
+    app_manager.game = GameControl()
+    return board()
+
+
+@app_manager.app.route("/board", methods=["GET", "POST"])
+def board():
+    if (app_manager.game is None):
+        app_manager.game = GameControl()
+    return {
+        "board": app_manager.game.main_board.to_fen(),
+        "possible": app_manager.game.main_board.format_valid_moves(app_manager.game.selected_piece),
+        "dead_white": app_manager.game.main_board.get_dead()[0],
+        "dead_black": app_manager.game.main_board.get_dead()[1],
+        "move_counts": app_manager.game.main_board.move_count_fen()
+    }
+
+
+@app_manager.app.route("/select", methods=['GET', 'POST'])
+def select():
+    if (flask.request.method == 'POST'):
+        if (app_manager.game is None):
+            return
+        data = dict(flask.request.json)
+        tile = data.get('tile')
+        tup = (int(tile[1]) - 1, ord(tile[0])-97)
+        app_manager.game.select_tile(tup[0], tup[1])
+    return "selected"
+
+
+@app_manager.app.route("/reset", methods=['GET', 'POST'])
+def reset():
+    app_manager.game = type(app_manager.game)()
+    flask.Flask.logger
+    return board()
+
 
 @app_manager.app.route("/synchronic")
 def synchronic():
     pass
 
+
 @app_manager.app.route("/singleplayer")
 def ai():
     pass
+
 
 @app_manager.app.route("/twoplayer")
 def classic():
     pass
 
-# Function to simplify making an html tag
-def makeTag(tag, *content, metadata=""):
-    if content == None:
-        return "<"+tag+" "+metadata+"/>"
-    return "<"+tag+" "+metadata+">"+mergeTags(*content)+"</"+tag+">"
 
-# Function to simplify making an html page
-def makePage(metadata, *tags):
-    head = makeTag("head", metadata)
-    body = makeTag("body", *tags)
-    html = makeTag("html", head, body)
-    return  "<!doctype html>\n"+html
-
-# Function to merge an undetermined number of html tags
-def mergeTags(*tags):
-    content = ""
-    for tag in tags:
-        content += tag + "\n"
-    return content
-
-app.run()
+if (__name__ == '__main__'):
+    app.run()

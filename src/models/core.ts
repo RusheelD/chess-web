@@ -3,98 +3,98 @@
 import { GameClient } from "../controllers";
 
 export enum PlayMode {
-    PassAndPlay,
-    Network,
-    WithComputer,
+  PassAndPlay,
+  Network,
+  WithComputer,
 }
 
 export enum GameMode {
-    Classic,
-    Synchronic
+  Classic,
+  Synchronic,
 }
 
 export interface PieceInfo {
-    color: string;
-    name: string;
-    isDead: boolean;
-    moveCount: number;
-    currentTile?: TileInfo;
+  color: string;
+  name: string;
+  isDead: boolean;
+  moveCount: number;
+  currentTile?: TileInfo;
 }
 
 export interface TileInfo {
-    rank: string;
-    file: string;
-    piece?: PieceInfo;
-    isSelected: boolean;
-    isRecentlyMoved: boolean;
-    isPossibleMove: boolean;
+  rank: string;
+  file: string;
+  piece?: PieceInfo;
+  isSelected: boolean;
+  isRecentlyMoved: boolean;
+  isPossibleMove: boolean;
 }
 
 export interface BoardInfo {
-    tiles: Map<string, TileInfo>;
-    pieces: PieceInfo[];
-    isFlipped: boolean;
-    selectedTile?: TileInfo;
-    recentMoves: TileInfo[];
-    possibleMoves: TileInfo[];
-    deadBlack: DeadInfo;
-    deadWhite: DeadInfo;
+  tiles: Map<string, TileInfo>;
+  pieces: PieceInfo[];
+  selectedTile?: TileInfo;
+  recentMoves: TileInfo[];
+  possibleMoves: TileInfo[];
+  deadBlack: DeadInfo;
+  deadWhite: DeadInfo;
 }
 
 export interface DeadInfo {
-    color: string;
-    pieces: PieceInfo[];
+  color: string;
+  pieces: PieceInfo[];
 }
 
 export interface Move {
-    from: string;   // Is in the form a1 or a8
-    to: string;     // is in the form b2 or c7
-    piece: PieceInfo;
-    isCheck: boolean;
-    isCastling: boolean;
-    isCheckMate: boolean;
+  from: string; // Is in the form a1 or a8
+  to: string; // is in the form b2 or c7
+  piece: PieceInfo;
+  isCheck: boolean;
+  isCastling: boolean;
+  isCheckMate: boolean;
 }
 
 export interface User {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
 export interface Player {
-    user?: User;
-    colorChosen: string;
-    isComputer: boolean;
+  user?: User;
+  colorChosen: string;
+  isComputer: boolean;
 }
 
 export interface ChessGame {
-    mode?: GameMode;
-    moves: Move[];  // all the moves made so far in the game
-    firstPlayer: Player;
-    secondPlayer: Player;
+  mode?: GameMode;
+  moves: Move[]; // all the moves made so far in the game
+  firstPlayer: Player;
+  secondPlayer: Player;
 }
 
 export interface GameContext {
-    game: ChessGame;
-    board: BoardInfo;
-    playMode: PlayMode;
-    playerToPlay: Player;
+  game: ChessGame;
+  board: BoardInfo;
+  playMode: PlayMode;
+  playerToPlay: Player;
 }
 
 // The following models use game client as properties. THis isn't really a good
 // structure.
 // TODO: Figure out a structure to remove from here and use it directly in the App
 export interface UserContext {
-    user: User;
-    gameContext?: GameContext;
-    gameClient?: GameClient;
-    enableTestMode: boolean;
+  user: User;
+  gameContext?: GameContext;
+  gameClient?: GameClient;
+  enableTestMode: boolean;
 }
 
 export interface BoardProps extends BoardInfo {
-    gameClient?: GameClient;
-    onSelectTile(tile: TileInfo): void;
+  gameClient?: GameClient;
+  resetKey: boolean;
+  onSelectTile(tile: TileInfo): void;
 }
 
 export interface TileProps extends TileInfo {
-    onSelect(): void;
+  onSelect(): void;
 }

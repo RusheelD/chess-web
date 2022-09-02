@@ -4,7 +4,7 @@ import { Piece } from '../pieces/Piece';
 import './Tile.css';
 
 export function Tile(props: TileProps) {
-    var colorCode = (parseInt(props.rank) % 2 + (props.file.toLowerCase().charCodeAt(0) - 96) % 2) % 2;
+    let colorCode = (parseInt(props.rank) % 2 + (props.file.toLowerCase().charCodeAt(0) - 96) % 2) % 2;
     const [selected, setSelected] = useState(props.isSelected);
     const [piece, setPiece] = useState(props.piece);
     const [recentlyMoved, setRecentlyMoved] = useState(props.isRecentlyMoved);
