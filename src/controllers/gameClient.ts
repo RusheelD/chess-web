@@ -1,4 +1,4 @@
-import { getDead, loadBoard, loadValidMoves } from "../models";
+import { getDead, loadBoard, loadLocations } from "../models";
 import { GameContext, Move, TileInfo } from "../models/core";
 import { log } from "../utils";
 import {
@@ -13,23 +13,115 @@ export class GameClient {
 
   constructor(gameContext: GameContext) {
     this.gameContext = gameContext;
+    this.initialize();
   }
 
   async initialize(): Promise<void> {
-    await fetch("/make", {
+    let res = await fetch("/make", {
       method: "POST",
       headers: {
         "content-type": "application/json;charset=UTF-8",
       },
       body: JSON.stringify({ mode: "twoplayer" }),
     });
+    let raw_data = await res.json();
+    this.loadClient(raw_data);
+  }
+
+  async getBackendBoard(): Promise<void> {
+    let res = await fetch("/board");
+    let raw_data = await res.json();
+    this.loadClient(raw_data);
+  }
+
+  loadClient(raw_data: any): void {
+    let data = {
+      fen: raw_data.board,
+      possible: raw_data.possible,
+      deadWhite: raw_data.dead_white,
+      deadBlack: raw_data.dead_black,
+      moveCounts: raw_data.move_counts,
+      recent: raw_data.recent,
+      currentPlayer: raw_data.current_player,
+      currentTile: raw_data.current_piece,
+      check: raw_data.check,
+      checkmate: raw_data.checkmate,
+      stalemate: raw_data.stalemate,
+    };
+    if (data.currentPlayer === "white") {
+      this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
+      if (this.playerTurnChangeCallback) {
+        this.playerTurnChangeCallback();
+      }
+    }
+    if (data.currentPlayer === "black") {
+      this.gameContext.playerToPlay = this.gameContext.game.secondPlayer;
+      if (this.playerTurnChangeCallback) {
+        this.playerTurnChangeCallback();
+      }
+    }
+
+    this.gameContext.board.deadWhite = {
+      color: "white",
+      pieces: getDead(data.deadWhite),
+    };
+    this.gameContext.board.deadBlack = {
+      color: "black",
+      pieces: getDead(data.deadBlack),
+    };
+
+    for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
+      for (let rank = 1; rank <= 8; rank++) {
+        let tile = this.gameContext.board.tiles.get(file + rank);
+        if (tile) {
+          tile.isPossibleMove = false;
+          tile.isRecentlyMoved = false;
+          tile.isSelected = false;
+          tile.isCheck = false;
+          tile.isCheckmate = false;
+          tile.isStalemate = false;
+        }
+      }
+    }
+
+    this.gameContext.board.possibleMoves = loadLocations(
+      this.gameContext.board,
+      data.possible
+    );
+    for (let tile of this.gameContext.board.possibleMoves) {
+      tile.isPossibleMove = true;
+    }
+    this.gameContext.board.recentMoves = loadLocations(
+      this.gameContext.board,
+      data.recent
+    );
+    for (let tile of this.gameContext.board.recentMoves) {
+      tile.isRecentlyMoved = true;
+    }
+    for (let tile of loadLocations(this.gameContext.board, data.currentTile)) {
+      tile.isSelected = true;
+      this.gameContext.board.selectedTile = tile;
+    }
+    for (let tile of loadLocations(this.gameContext.board, data.check)) {
+      tile.isCheck = true;
+    }
+    for (let tile of loadLocations(this.gameContext.board, data.checkmate)) {
+      tile.isCheckmate = true;
+    }
+    for (let tile of loadLocations(this.gameContext.board, data.stalemate)) {
+      tile.isStalemate = true;
+    }
+
+    loadBoard(data.fen, data.moveCounts, this.gameContext.board);
+    this.gameContext.board = { ...this.gameContext.board };
+    this.updateBoard();
   }
 
   // The following are the handlers for various events
   // This part needs heavy refactoring ...
   async handleSelectTile(tile: TileInfo): Promise<void> {
-    let tilesToUpdate = [];
-    let selectedTile = this.gameContext.board.selectedTile;
+    // let tilesToUpdate = [];
+    // let selectedTile = this.gameContext.board.selectedTile;
     await fetch("/select", {
       method: "POST",
       headers: {
@@ -38,65 +130,67 @@ export class GameClient {
       body: JSON.stringify({ tile: tile.file + tile.rank }),
     });
 
-    // No selected tile and clicked on an empty tile
-    // do nothing
-    if (!selectedTile && !tile.piece) {
-      return;
-    }
+    this.getBackendBoard();
 
-    // If no selected tile and clicked on own color
-    // select the tile
-    if (
-      !selectedTile &&
-      tile.piece?.color === this.gameContext.playerToPlay.colorChosen
-    ) {
-      tilesToUpdate.push(...(await this.selectTile(tile)));
-      this.updateTilesOnBoard(
-        tilesToUpdate,
-        false,
-        this.gameContext.board.selectedTile
-      );
-      return;
-    }
+    // // No selected tile and clicked on an empty tile
+    // // do nothing
+    // if (!selectedTile && !tile.piece) {
+    //   return;
+    // }
 
-    // If clicked on an already selected tile
-    // then unselect
-    if (selectedTile === tile) {
-      tilesToUpdate.push(...this.unselectTile());
-      this.updateTilesOnBoard(
-        tilesToUpdate,
-        false,
-        this.gameContext.board.selectedTile
-      );
-      return;
-    }
+    // // If no selected tile and clicked on own color
+    // // select the tile
+    // if (
+    //   !selectedTile &&
+    //   tile.piece?.color === this.gameContext.playerToPlay.colorChosen
+    // ) {
+    //   tilesToUpdate.push(...(await this.selectTile(tile)));
+    //   this.updateTilesOnBoard(
+    //     tilesToUpdate,
+    //     false,
+    //     this.gameContext.board.selectedTile
+    //   );
+    //   return;
+    // }
 
-    // If selected tile exists and clicked on another own piece
-    // then switch selection
-    if (
-      selectedTile &&
-      tile.piece?.color === this.gameContext.playerToPlay.colorChosen
-    ) {
-      tilesToUpdate.push(...this.unselectTile());
-      tilesToUpdate.push(...(await this.selectTile(tile)));
-      this.updateTilesOnBoard(
-        tilesToUpdate,
-        false,
-        this.gameContext.board.selectedTile
-      );
-      return;
-    }
+    // // If clicked on an already selected tile
+    // // then unselect
+    // if (selectedTile === tile) {
+    //   tilesToUpdate.push(...this.unselectTile());
+    //   this.updateTilesOnBoard(
+    //     tilesToUpdate,
+    //     false,
+    //     this.gameContext.board.selectedTile
+    //   );
+    //   return;
+    // }
 
-    // Handle moving pieces now
-    if (this.isValidMove(tile)) {
-      tilesToUpdate.push(...this.movePiece(selectedTile!, tile));
-      tilesToUpdate.push(...this.unselectTile());
-      this.updateTilesOnBoard(
-        tilesToUpdate,
-        true,
-        this.gameContext.board.selectedTile
-      );
-    }
+    // // If selected tile exists and clicked on another own piece
+    // // then switch selection
+    // if (
+    //   selectedTile &&
+    //   tile.piece?.color === this.gameContext.playerToPlay.colorChosen
+    // ) {
+    //   tilesToUpdate.push(...this.unselectTile());
+    //   tilesToUpdate.push(...(await this.selectTile(tile)));
+    //   this.updateTilesOnBoard(
+    //     tilesToUpdate,
+    //     false,
+    //     this.gameContext.board.selectedTile
+    //   );
+    //   return;
+    // }
+
+    // // Handle moving pieces now
+    // if (this.isValidMove(tile)) {
+    //   tilesToUpdate.push(...this.movePiece(selectedTile!, tile));
+    //   tilesToUpdate.push(...this.unselectTile());
+    //   this.updateTilesOnBoard(
+    //     tilesToUpdate,
+    //     true,
+    //     this.gameContext.board.selectedTile
+    //   );
+    // }
   }
 
   updateBoard() {
@@ -105,7 +199,7 @@ export class GameClient {
     }
   }
 
-  updateTilesOnBoard(
+  async updateTilesOnBoard(
     changedTiles: TileInfo[],
     moveComplete: boolean,
     selectedTile?: TileInfo
@@ -134,17 +228,22 @@ export class GameClient {
         this.playerTurnChangeCallback();
       }
     }
-
-    this.updateBoard();
+    this.getBackendBoard();
   }
 
   // utility function
   unselectTile(): TileInfo[] {
     let changedTiles: TileInfo[] = [];
 
-    for (let tile of this.gameContext.board.possibleMoves) {
-      tile.isPossibleMove = false;
-      changedTiles.push(tile);
+    for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
+      for (let rank = 1; rank <= 8; rank++) {
+        let tile = this.gameContext.board.tiles.get(file + rank);
+        if (tile) {
+          tile.isPossibleMove = false;
+          tile.isSelected = false;
+          changedTiles.push(tile);
+        }
+      }
     }
 
     this.gameContext.board.possibleMoves = [];
@@ -169,7 +268,6 @@ export class GameClient {
     console.log(validMoves);
 
     for (let moveTile of validMoves) {
-      console.log(moveTile);
       moveTile.isPossibleMove = true;
       changedTiles.push(moveTile);
     }
@@ -179,47 +277,9 @@ export class GameClient {
   }
 
   async reset(): Promise<void> {
-    let data = {
-      fen: "",
-      deadWhite: "",
-      deadBlack: "",
-      moveCounts: "",
-    };
     let res = await fetch("/reset");
     let raw_data = await res.json();
-    data = {
-      fen: raw_data.board,
-      deadWhite: raw_data.dead_white,
-      deadBlack: raw_data.dead_black,
-      moveCounts: raw_data.move_counts,
-    };
-
-    if (this.gameContext.playerToPlay === this.gameContext.game.secondPlayer) {
-      this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
-      if (this.playerTurnChangeCallback) {
-        this.playerTurnChangeCallback();
-      }
-    }
-    this.gameContext.board.deadWhite = {
-      color: "white",
-      pieces: getDead(data.deadWhite),
-    };
-    this.gameContext.board.deadBlack = {
-      color: "black",
-      pieces: getDead(data.deadBlack),
-    };
-    this.gameContext.board.recentMoves = [];
-    for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
-      for (let rank = 1; rank <= 8; rank++) {
-        let tile = this.gameContext.board.tiles.get(file + rank);
-        if (tile) {
-          tile.isPossibleMove = false;
-          tile.isRecentlyMoved = false;
-          tile.isSelected = false;
-        }
-      }
-    }
-    loadBoard(data.fen, data.moveCounts, this.gameContext.board);
+    this.loadClient(raw_data);
   }
 
   async computeValidMoves(): Promise<TileInfo[]> {
@@ -229,7 +289,7 @@ export class GameClient {
         data.possible = raw_data.possible;
       })
     );
-    return loadValidMoves(this.gameContext.board, data.possible);
+    return loadLocations(this.gameContext.board, data.possible);
   }
 
   movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {

@@ -29,6 +29,7 @@ class GameControl(object):
             self.recent_move = [[self.selected_piece.row,
                                  self.selected_piece.column], [row, column]]
             self.selected_piece.move(row, column)
+            self.copy_recent_move()
             self.color_to_move = abs(self.color_to_move - 1)
             self.is_piece_selected = False
             self.selected_piece = None
@@ -39,6 +40,11 @@ class GameControl(object):
             self.selected_piece = self.main_board.grid[row][column]
 
         return self.selected_piece
+
+    def copy_recent_move(self):
+        self.recent_move = []
+        for move in self.main_board.recent_move:
+            self.recent_move.append(move)
 
     def is_game_over(self):
         if (self.main_board.no_valid_moves(self.color_to_move)):
@@ -53,6 +59,61 @@ class GameControl(object):
 
     def update(self):
         return
+
+    def current_player(self):
+        return "white" if self.color_to_move == 0 else "black"
+
+    def current_piece(self):
+        retstr = ""
+        if (self.is_piece_selected):
+            retstr += chr(self.selected_piece.column + 97) + \
+                str(self.selected_piece.row+1)
+        return retstr
+
+    def send_recent(self):
+        retstr = ""
+        for move in self.recent_move:
+            if (move is None):
+                continue
+            retstr += chr(move[1] + 97)+str(move[0]+1)+','
+        return retstr[:-1]
+
+    def send_check(self):
+        retstr = ""
+        if (self.main_board.white_in_check()):
+            retstr += chr(self.main_board.get_white_king_pos()
+                          [1] + 97)+str(self.main_board.get_white_king_pos()[0]+1)
+            return retstr
+        if (self.main_board.black_in_check()):
+            retstr += chr(self.main_board.get_black_king_pos()
+                          [1] + 97)+str(self.main_board.get_black_king_pos()[0]+1)
+            return retstr
+        return retstr
+
+    def send_checkmate(self):
+        over = self.is_game_over()
+        retstr = ""
+        if (over[0]):
+            if (over[1] == 0):
+                retstr += chr(self.main_board.get_white_king_pos()
+                              [1] + 97)+str(self.main_board.get_white_king_pos()[0]+1)
+                return retstr
+            elif (over[1] == 1):
+                retstr += chr(self.main_board.get_black_king_pos()
+                              [1] + 97)+str(self.main_board.get_black_king_pos()[0]+1)
+                return retstr
+        return retstr
+
+    def send_stalemate(self):
+        over = self.is_game_over()
+        retstr = ""
+        if (over[0] and over[1] < 0):
+            retstr += chr(self.main_board.get_white_king_pos()
+                          [1] + 97)+str(self.main_board.get_white_king_pos()[0]+1)
+            retstr += ","
+            retstr += chr(self.main_board.get_black_king_pos()
+                          [1] + 97)+str(self.main_board.get_black_king_pos()[0]+1)
+        return retstr
 
     def load_game(self):
         self.main_board = Board()

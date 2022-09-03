@@ -33,6 +33,7 @@ class Board(object):
         self.moves_made = []
         self.dead_white = []
         self.dead_black = []
+        self.recent_move = []
         self.pieces = [Rook(self.white_images[1], 0, 0, 0, self), Knight(self.white_images[2], 0, 1, 0, self),
                        Bishop(self.white_images[3], 0, 2, 0, self), Queen(
                            self.white_images[4], 0, 3, 0, self),
@@ -122,7 +123,9 @@ class Board(object):
             string = string[:-1]+'/'
         return string[:-1]
 
-    def refresh_pieces(self):
+    def refresh_pieces(self, move=False):
+        if not (move):
+            self.recent_move.clear()
         for row in self.grid:
             for piece in row:
                 piece = None

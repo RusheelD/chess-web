@@ -104,13 +104,12 @@ export function getDead(dead: string): PieceInfo[] {
   return pieces;
 }
 
-export function loadValidMoves(board: BoardInfo, moves: string): TileInfo[] {
+export function loadLocations(board: BoardInfo, locations: string): TileInfo[] {
   let tiles: TileInfo[] = [];
-  console.log(board.tiles);
-  console.log(moves);
-  for (let move of moves.split(",")) {
-    if (board.tiles.has(move)) {
-      tiles.push(board.tiles.get(move)!);
+  if (locations === "") return tiles;
+  for (let location of locations.split(",")) {
+    if (board.tiles.has(location)) {
+      tiles.push(board.tiles.get(location)!);
     }
   }
   return tiles;
@@ -153,6 +152,9 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
         isSelected: false,
         isRecentlyMoved: false,
         isPossibleMove: false,
+        isCheck: false,
+        isCheckmate: false,
+        isStalemate: false,
       });
     }
   }
@@ -225,4 +227,3 @@ function createGame(currentUser: User): ChessGame {
 }
 
 export const userContext = initialize();
-userContext.gameClient!.initialize();

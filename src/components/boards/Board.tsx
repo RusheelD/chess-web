@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
-import { BoardProps, loadBoard } from "../../models";
+import { BoardProps } from "../../models";
 import { Tile } from "../tiles/Tile";
 import "./Board.css";
 
 export function Board(props: BoardProps) {
   const [tiles, setTiles] = useState(props.tiles);
-  const [data, setData] = useState({ fen: "", moveCounts: "" });
 
   useEffect(() => {
-    fetch("/board").then((res) =>
-      res.json().then((raw_data) => {
-        setData({ fen: raw_data.board, moveCounts: raw_data.move_counts });
-      })
-    );
     setTiles(props.tiles);
   }, [props.tiles, props.selectedTile, props.gameClient, props.resetKey]);
 
@@ -21,8 +15,6 @@ export function Board(props: BoardProps) {
     props.gameClient!.gameContext.game.firstPlayer
       ? 0
       : 1;
-  console.log(data);
-  loadBoard(data.fen, data.moveCounts, props);
 
   return (
     <div className="board">

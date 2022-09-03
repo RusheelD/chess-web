@@ -65,6 +65,8 @@ class Piece(object):
             self.board.moves_made.append(
                 [self.board.current_turn, self, origin_row, origin_column, row, column, self.replacement != None])
             self.board.current_turn += self.color
+            self.board.recent_move.append([origin_row, origin_column])
+            self.board.recent_move.append([row, column])
             if (self.replacement is not None):
                 if (self.color == 0):
                     self.board.dead_white.append(self.replacement)
@@ -76,7 +78,7 @@ class Piece(object):
         self.board.grid[row][column] = self
         self.row = row
         self.column = column
-        self.board.refresh_pieces()
+        self.board.refresh_pieces(True)
 
     def undo_move(self, row, column, temp):
         self.board.grid[row][column] = self

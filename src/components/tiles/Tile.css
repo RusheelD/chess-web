@@ -2,7 +2,7 @@
     display: inline-block;
 }
 
-.tile > span {
+.tile>span {
     display: inline-block;
     vertical-align: bottom;
     width: calc(var(--piece-width) * var(--piece-scale));
@@ -26,5 +26,17 @@
 }
 
 .possible {
-    background-color: rgba(255, 255, 50, .6);
+    background-color: rgba(255, 255, 50, 0.6);
+}
+
+.check {
+    background-color: rgb(255, 0, 0);
+}
+
+.checkmate {
+    background-color: rgb(175, 0, 0);
+}
+
+.stalemate {
+    background-color: rgb(0, 0, 255);
 }

@@ -28,6 +28,9 @@ export interface TileInfo {
   isSelected: boolean;
   isRecentlyMoved: boolean;
   isPossibleMove: boolean;
+  isCheck: boolean;
+  isCheckmate: boolean;
+  isStalemate: boolean;
 }
 
 export interface BoardInfo {
