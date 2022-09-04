@@ -41,6 +41,8 @@ export interface BoardInfo {
   possibleMoves: TileInfo[];
   deadBlack: DeadInfo;
   deadWhite: DeadInfo;
+  inCheck?: TileInfo;
+  inStalemate?: TileInfo[];
 }
 
 export interface DeadInfo {

@@ -68,7 +68,7 @@ class Piece(object):
             self.board.recent_move.append([origin_row, origin_column])
             self.board.recent_move.append([row, column])
             if (self.replacement is not None):
-                if (self.color == 0):
+                if (self.color != 0):
                     self.board.dead_white.append(self.replacement)
                 else:
                     self.board.dead_black.append(self.replacement)

@@ -2,6 +2,12 @@ import { getDead, loadBoard, loadLocations } from "../models";
 import { GameContext, Move, TileInfo } from "../models/core";
 import { log } from "../utils";
 import {
+  getAllValidMoves,
+  kingsInCheck,
+  pieceControllers,
+  stalemate,
+} from "./piece";
+import {
   checkCastleAndGetRook,
   checkEnpassantKillAndGetDeadTile,
 } from "./piece";
@@ -48,6 +54,7 @@ export class GameClient {
       checkmate: raw_data.checkmate,
       stalemate: raw_data.stalemate,
     };
+    console.log(data);
     if (data.currentPlayer === "white") {
       this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
       if (this.playerTurnChangeCallback) {
@@ -104,9 +111,11 @@ export class GameClient {
     }
     for (let tile of loadLocations(this.gameContext.board, data.check)) {
       tile.isCheck = true;
+      this.gameContext.board.inCheck = tile;
     }
     for (let tile of loadLocations(this.gameContext.board, data.checkmate)) {
       tile.isCheckmate = true;
+      this.gameContext.board.inCheck = tile;
     }
     for (let tile of loadLocations(this.gameContext.board, data.stalemate)) {
       tile.isStalemate = true;
@@ -119,10 +128,10 @@ export class GameClient {
 
   // The following are the handlers for various events
   // This part needs heavy refactoring ...
-  async handleSelectTile(tile: TileInfo): Promise<void> {
-    // let tilesToUpdate = [];
-    // let selectedTile = this.gameContext.board.selectedTile;
-    await fetch("/select", {
+  handleSelectTile(tile: TileInfo): void {
+    let tilesToUpdate = [];
+    let selectedTile = this.gameContext.board.selectedTile;
+    fetch("/select", {
       method: "POST",
       headers: {
         "content-type": "application/json;charset=UTF-8",
@@ -130,67 +139,91 @@ export class GameClient {
       body: JSON.stringify({ tile: tile.file + tile.rank }),
     });
 
-    this.getBackendBoard();
+    // No selected tile and clicked on an empty tile
+    // do nothing
+    if (!selectedTile && !tile.piece) {
+      return;
+    }
 
-    // // No selected tile and clicked on an empty tile
-    // // do nothing
-    // if (!selectedTile && !tile.piece) {
-    //   return;
-    // }
+    // If no selected tile and clicked on own color
+    // select the tile
+    if (
+      !selectedTile &&
+      tile.piece?.color === this.gameContext.playerToPlay.colorChosen
+    ) {
+      tilesToUpdate.push(...this.selectTile(tile));
+      this.updateTilesOnBoard(
+        tilesToUpdate,
+        false,
+        this.gameContext.board.selectedTile
+      );
+      return;
+    }
 
-    // // If no selected tile and clicked on own color
-    // // select the tile
-    // if (
-    //   !selectedTile &&
-    //   tile.piece?.color === this.gameContext.playerToPlay.colorChosen
-    // ) {
-    //   tilesToUpdate.push(...(await this.selectTile(tile)));
-    //   this.updateTilesOnBoard(
-    //     tilesToUpdate,
-    //     false,
-    //     this.gameContext.board.selectedTile
-    //   );
-    //   return;
-    // }
+    // If clicked on an already selected tile
+    // then unselect
+    if (selectedTile === tile) {
+      tilesToUpdate.push(...this.unselectTile());
+      this.updateTilesOnBoard(
+        tilesToUpdate,
+        false,
+        this.gameContext.board.selectedTile
+      );
+      return;
+    }
 
-    // // If clicked on an already selected tile
-    // // then unselect
-    // if (selectedTile === tile) {
-    //   tilesToUpdate.push(...this.unselectTile());
-    //   this.updateTilesOnBoard(
-    //     tilesToUpdate,
-    //     false,
-    //     this.gameContext.board.selectedTile
-    //   );
-    //   return;
-    // }
+    // If selected tile exists and clicked on another own piece
+    // then switch selection
+    if (
+      selectedTile &&
+      tile.piece?.color === this.gameContext.playerToPlay.colorChosen
+    ) {
+      tilesToUpdate.push(...this.unselectTile());
+      tilesToUpdate.push(...this.selectTile(tile));
+      this.updateTilesOnBoard(
+        tilesToUpdate,
+        false,
+        this.gameContext.board.selectedTile
+      );
+      return;
+    }
 
-    // // If selected tile exists and clicked on another own piece
-    // // then switch selection
-    // if (
-    //   selectedTile &&
-    //   tile.piece?.color === this.gameContext.playerToPlay.colorChosen
-    // ) {
-    //   tilesToUpdate.push(...this.unselectTile());
-    //   tilesToUpdate.push(...(await this.selectTile(tile)));
-    //   this.updateTilesOnBoard(
-    //     tilesToUpdate,
-    //     false,
-    //     this.gameContext.board.selectedTile
-    //   );
-    //   return;
-    // }
-
-    // // Handle moving pieces now
-    // if (this.isValidMove(tile)) {
-    //   tilesToUpdate.push(...this.movePiece(selectedTile!, tile));
-    //   tilesToUpdate.push(...this.unselectTile());
-    //   this.updateTilesOnBoard(
-    //     tilesToUpdate,
-    //     true,
-    //     this.gameContext.board.selectedTile
-    //   );
-    // }
+    // Handle moving pieces now
+    if (this.isValidMove(tile)) {
+      tilesToUpdate.push(...this.movePiece(selectedTile!, tile));
+      tilesToUpdate.push(...this.unselectTile());
+      kingsInCheck(this.gameContext.game, this.gameContext.board);
+      stalemate(this.gameContext.game, this.gameContext.board);
+      let king = this.gameContext.board.inCheck;
+      let kings = this.gameContext.board.inStalemate;
+      if (king) {
+        if (
+          getAllValidMoves(
+            this.gameContext.game,
+            this.gameContext.board,
+            king.piece!.color
+          ).length === 0
+        ) {
+          king.isCheckmate = true;
+          tilesToUpdate.push(king);
+        } else {
+          king.isCheck = true;
+          tilesToUpdate.push(king);
+        }
+      }
+      if (kings) {
+        kings.forEach((king) => {
+          king.isStalemate = true;
+          tilesToUpdate.push(king);
+        });
+      }
+      this.updateTilesOnBoard(
+        tilesToUpdate,
+        true,
+        this.gameContext.board.selectedTile
+      );
+      return;
+    }
   }
 
   updateBoard() {
@@ -199,7 +232,7 @@ export class GameClient {
     }
   }
 
-  async updateTilesOnBoard(
+  updateTilesOnBoard(
     changedTiles: TileInfo[],
     moveComplete: boolean,
     selectedTile?: TileInfo
@@ -228,7 +261,8 @@ export class GameClient {
         this.playerTurnChangeCallback();
       }
     }
-    this.getBackendBoard();
+
+    this.updateBoard();
   }
 
   // utility function
@@ -242,6 +276,13 @@ export class GameClient {
           tile.isPossibleMove = false;
           tile.isSelected = false;
           changedTiles.push(tile);
+          if (tile !== this.gameContext.board.inCheck) {
+            tile.isCheck = false;
+            tile.isCheckmate = false;
+          }
+          if (!this.gameContext.board.inStalemate?.includes(tile)) {
+            tile.isStalemate = false;
+          }
         }
       }
     }
@@ -257,14 +298,16 @@ export class GameClient {
     return changedTiles;
   }
 
-  async selectTile(tile: TileInfo): Promise<TileInfo[]> {
+  selectTile(tile: TileInfo): TileInfo[] {
     let changedTiles: TileInfo[] = [];
 
     changedTiles.push(tile);
     tile.isSelected = true;
     this.gameContext.board.selectedTile = tile;
 
-    let validMoves: TileInfo[] = await this.computeValidMoves();
+    let validMoves: TileInfo[] = pieceControllers
+      .get(tile.piece!.name)
+      ?.computeValidMoves(this.gameContext.game, this.gameContext.board, tile)!;
     console.log(validMoves);
 
     for (let moveTile of validMoves) {
@@ -282,15 +325,16 @@ export class GameClient {
     this.loadClient(raw_data);
   }
 
-  async computeValidMoves(): Promise<TileInfo[]> {
-    let data = { possible: "" };
-    await fetch("/board").then((res) =>
-      res.json().then((raw_data) => {
-        data.possible = raw_data.possible;
-      })
-    );
-    return loadLocations(this.gameContext.board, data.possible);
-  }
+  // computeValidMoves(): TileInfo[] {
+  //   let data = { possible: "" };
+  //   await fetch("/board").then((res) =>
+  //     res.json().then((raw_data) => {
+  //       data.possible = raw_data.possible;
+  //     })
+  //   );
+  //   return loadLocations(this.gameContext.board, data.possible);
+  //   return [];
+  // }
 
   movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {
     let changedTiles: TileInfo[] = [];

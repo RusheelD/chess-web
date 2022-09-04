@@ -232,7 +232,13 @@ class Board(object):
         white = ""
         black = ""
         for piece in self.dead_white:
-            white += str(type(piece)).split('.')[1][0].upper()
+            if (type(piece) != Knight):
+                white += str(type(piece)).split('.')[1][0].upper()
+            else:
+                white += "N"
         for piece in self.dead_black:
-            black += str(type(piece)).split('.')[1][0].lower()
+            if (type(piece) != Knight):
+                black += str(type(piece)).split('.')[1][0].lower()
+            else:
+                black += "n"
         return [white, black]
