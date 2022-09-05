@@ -1,11 +1,17 @@
-import { PromotionInfo, TileInfo, TileProps } from "../../models";
+import { PromotionProps, TileInfo, TileProps } from "../../models";
 import { Tile } from "../tiles/Tile";
+import "./Promotion.css";
 
-export function Promotion(props: PromotionInfo) {
-  let rank = props.color === "white" ? "9" : "10";
+export function Promotion(props: PromotionProps) {
+  let location = props.location;
+  if (location === "" && props.color === "") {
+    location = "q9";
+  }
+  let promoClasses = "promo " + location.charAt(0) + " _" + location.charAt(1);
+  let rank = location.charAt(1);
   let base: TileInfo = {
     rank: rank,
-    file: "i",
+    file: location.charAt(0),
     isSelected: false,
     isRecentlyMoved: false,
     isPossibleMove: false,
@@ -28,7 +34,7 @@ export function Promotion(props: PromotionInfo) {
       isDead: false,
       moveCount: 0,
     },
-    onSelect: () => props.onSelectPromotion(base),
+    onSelect: () => props.onSelectPromotion(queen),
   };
   let rook: TileProps = {
     ...base,
@@ -38,7 +44,7 @@ export function Promotion(props: PromotionInfo) {
       isDead: false,
       moveCount: 0,
     },
-    onSelect: () => props.onSelectPromotion(base),
+    onSelect: () => props.onSelectPromotion(rook),
   };
   let bishop: TileProps = {
     ...base,
@@ -48,7 +54,7 @@ export function Promotion(props: PromotionInfo) {
       isDead: false,
       moveCount: 0,
     },
-    onSelect: () => props.onSelectPromotion(base),
+    onSelect: () => props.onSelectPromotion(bishop),
   };
   let knight: TileProps = {
     ...base,
@@ -58,21 +64,24 @@ export function Promotion(props: PromotionInfo) {
       isDead: false,
       moveCount: 0,
     },
-    onSelect: () => props.onSelectPromotion(base),
+    onSelect: () => props.onSelectPromotion(knight),
   };
+
   return (
-    <div>
-      <div>
+    <div className={promoClasses}>
+      <div className={"above"}>
         <Tile {...transparent} />
         <Tile {...queen} />
         <Tile {...transparent} />
       </div>
-      <div>
+      <div className={"at"}>
         <Tile {...bishop} />
-        <Tile {...transparent}></Tile>
+        <div className={"center"}>
+          <Tile {...transparent}></Tile>
+        </div>
         <Tile {...knight} />
       </div>
-      <div>
+      <div className={"below"}>
         <Tile {...transparent} />
         <Tile {...rook} />
         <Tile {...transparent} />

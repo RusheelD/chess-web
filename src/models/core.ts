@@ -54,6 +54,10 @@ export interface BoardInfo {
   deadWhite: DeadInfo;
   inCheck?: TileInfo;
   inStalemate?: TileInfo[];
+  inPromotion?: TileInfo;
+  pending?: TileInfo;
+  promotionChoice?: string;
+  promotion: PromotionInfo;
 }
 
 export interface DeadInfo {
@@ -64,6 +68,9 @@ export interface DeadInfo {
 export interface PromotionInfo {
   color: string;
   location: string;
+}
+
+export interface PromotionProps extends PromotionInfo {
   onSelectPromotion(tile: TileInfo): void;
 }
 

@@ -75,6 +75,9 @@ export class GameClient {
     this.gameContext.game.isStarted = false;
     this.gameContext.board.inCheck = undefined;
     this.gameContext.board.inStalemate = undefined;
+    this.gameContext.board.inPromotion = undefined;
+    this.gameContext.board.pending = undefined;
+    this.gameContext.board.promotionChoice = undefined;
 
     this.gameContext.board.deadWhite = {
       color: "white",
@@ -141,17 +144,79 @@ export class GameClient {
     this.updateBoard();
   }
 
+  handleSelectPromotion(tile: TileInfo): void {
+    if (this.gameContext.board.inPromotion) {
+      this.gameContext.board.promotionChoice = tile.piece!.name;
+      console.log(tile);
+      this.handleSelectTile(this.gameContext.board.pending!);
+    }
+  }
+
   // The following are the handlers for various events
   // This part needs heavy refactoring ...
   handleSelectTile(tile: TileInfo): void {
     let tilesToUpdate = [];
     let selectedTile = this.gameContext.board.selectedTile;
+
+    if (
+      selectedTile &&
+      selectedTile.piece!.name === "pawn" &&
+      this.isValidMove(tile) &&
+      !this.gameContext.board.inPromotion &&
+      !this.gameContext.board.promotionChoice
+    ) {
+      if (tile.rank === "1" && selectedTile.piece!.color === "black") {
+        this.gameContext.board.inPromotion = selectedTile;
+        this.gameContext.board.pending = tile;
+        this.gameContext.board.promotionChoice = undefined;
+        this.gameContext.board.promotion = {
+          color: this.gameContext.board.inPromotion.piece!.color,
+          location:
+            this.gameContext.board.inPromotion.file +
+            this.gameContext.board.inPromotion.rank,
+        };
+        this.updateBoard();
+        return;
+      }
+      if (tile.rank === "8" && selectedTile.piece!.color === "white") {
+        this.gameContext.board.inPromotion = selectedTile;
+        this.gameContext.board.pending = tile;
+        this.gameContext.board.promotionChoice = undefined;
+        this.gameContext.board.promotion = {
+          color: this.gameContext.board.inPromotion.piece!.color,
+          location:
+            this.gameContext.board.inPromotion.file +
+            this.gameContext.board.inPromotion.rank,
+        };
+        this.updateBoard();
+        return;
+      }
+    }
+
+    if (
+      this.gameContext.board.inPromotion &&
+      !this.gameContext.board.promotionChoice
+    ) {
+      return;
+    } else {
+      this.gameContext.board.inPromotion = undefined;
+    }
+
+    let promoChoice = this.gameContext.board.promotionChoice;
+
+    let choice = promoChoice
+      ? promoChoice.charAt(0).toUpperCase() + promoChoice.substring(1)
+      : "";
+
     fetch("/select", {
       method: "POST",
       headers: {
         "content-type": "application/json;charset=UTF-8",
       },
-      body: JSON.stringify({ tile: tile.file + tile.rank, choice: "Queen" }),
+      body: JSON.stringify({
+        tile: tile.file + tile.rank,
+        choice: choice ? choice : "Queen",
+      }),
     });
 
     // No selected tile and clicked on an empty tile
@@ -241,6 +306,14 @@ export class GameClient {
       );
       return;
     }
+
+    this.gameContext.board.inPromotion = undefined;
+    this.gameContext.board.promotionChoice = undefined;
+    this.gameContext.board.pending = undefined;
+    this.gameContext.board.promotion = {
+      color: "",
+      location: "",
+    };
   }
 
   updateBoard() {
@@ -426,7 +499,9 @@ export class GameClient {
         (targetTile.rank === "8" && targetTile.piece.color === "white") ||
         (targetTile.rank === "1" && targetTile.piece.color === "black")
       ) {
-        targetTile.piece.name = "queen";
+        targetTile.piece.name = this.gameContext.board.promotionChoice
+          ? this.gameContext.board.promotionChoice
+          : "queen";
       }
     }
 

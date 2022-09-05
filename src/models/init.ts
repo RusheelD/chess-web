@@ -137,6 +137,7 @@ export function loadBoard(
         };
         board.tiles.get(tile)!.piece = piece;
         piece.currentTile = board.tiles.get(tile);
+        board.pieces.push(piece);
       } else {
         board.tiles.get(tile)!.piece = undefined;
       }
@@ -179,6 +180,10 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
     deadBlack: {
       color: "black",
       pieces: [],
+    },
+    promotion: {
+      color: "",
+      location: "",
     },
   };
 }

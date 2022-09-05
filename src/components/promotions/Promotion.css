@@ -1,0 +1,80 @@
+._7 {
+    --flip: 1;
+}
+
+._2 {
+    --flip: 0;
+}
+
+._9 {
+    --flip: 20;
+}
+
+.a {
+    --offset: calc(7 * var(--flip)+1);
+}
+
+.b {
+    --offset: calc(5 * var(--flip)+2);
+}
+
+.c {
+    --offset: calc(3 * var(--flip)+3);
+}
+
+.d {
+    --offset: calc(1 * var(--flip)+4);
+}
+
+.e {
+    --offset: calc(-1 * var(--flip)+5);
+}
+
+.f {
+    --offset: calc(-3 * var(--flip)+6);
+}
+
+.g {
+    --offset: calc(-5 * var(--flip)+7);
+}
+
+.h {
+    --offset: calc(-7 * var(--flip)+8);
+}
+
+.above {
+    display: block;
+}
+
+.above div {
+    display: inline-block;
+}
+
+.below {
+    display: block;
+}
+
+.below div {
+    display: inline-block;
+}
+
+.at {
+    display: block;
+}
+
+.at div {
+    display: inline-block;
+}
+
+.promo {
+    position: absolute;
+    right: calc(var(--offset) * var(--piece-width) * var(--piece-scale) - 40px);
+    top: calc(var(--piece-height) * var(--piece-scale) + 48px);
+    pointer-events: all;
+    visibility: hidden;
+}
+
+.q {
+    pointer-events: none;
+    visibility: hidden;
+}
