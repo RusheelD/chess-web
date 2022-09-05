@@ -8,7 +8,13 @@ export function Board(props: BoardProps) {
 
   useEffect(() => {
     setTiles(props.tiles);
-  }, [props.tiles, props.selectedTile, props.gameClient, props.resetKey]);
+  }, [
+    props.tiles,
+    props.selectedTile,
+    props.gameClient,
+    props.resetKey,
+    props.promotion,
+  ]);
 
   const factor =
     props.gameClient!.gameContext.playerToPlay ===

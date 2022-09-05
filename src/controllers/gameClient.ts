@@ -18,6 +18,7 @@ export class GameClient {
   playerTurnChangeCallback?: () => void;
   gameStartedCallback?: () => void;
   gameEndedCallback?: () => void;
+  promotionChangeCallback?: () => void;
 
   constructor(gameContext: GameContext) {
     this.gameContext = gameContext;
@@ -78,6 +79,10 @@ export class GameClient {
     this.gameContext.board.inPromotion = undefined;
     this.gameContext.board.pending = undefined;
     this.gameContext.board.promotionChoice = undefined;
+    this.gameContext.board.promotion = {
+      color: "",
+      location: "q9",
+    };
 
     this.gameContext.board.deadWhite = {
       color: "white",
@@ -175,6 +180,7 @@ export class GameClient {
             this.gameContext.board.inPromotion.file +
             this.gameContext.board.inPromotion.rank,
         };
+        this.updatePromotion();
         this.updateBoard();
         return;
       }
@@ -188,6 +194,7 @@ export class GameClient {
             this.gameContext.board.inPromotion.file +
             this.gameContext.board.inPromotion.rank,
         };
+        this.updatePromotion();
         this.updateBoard();
         return;
       }
@@ -197,6 +204,7 @@ export class GameClient {
       this.gameContext.board.inPromotion &&
       !this.gameContext.board.promotionChoice
     ) {
+      this.updatePromotion();
       return;
     } else {
       this.gameContext.board.inPromotion = undefined;
@@ -304,7 +312,6 @@ export class GameClient {
         true,
         this.gameContext.board.selectedTile
       );
-      return;
     }
 
     this.gameContext.board.inPromotion = undefined;
@@ -312,13 +319,21 @@ export class GameClient {
     this.gameContext.board.pending = undefined;
     this.gameContext.board.promotion = {
       color: "",
-      location: "",
+      location: "q9",
     };
+    this.updatePromotion();
+    this.updateBoard();
   }
 
   updateBoard() {
     if (this.updateCallback) {
       this.updateCallback();
+    }
+  }
+
+  updatePromotion() {
+    if (this.promotionChangeCallback) {
+      this.promotionChangeCallback();
     }
   }
 
@@ -557,6 +572,10 @@ export class GameClient {
 
   setBoardUpdateHandler(handler: () => void) {
     this.updateCallback = handler;
+  }
+
+  setPromotionChangeHandler(handler: () => void) {
+    this.promotionChangeCallback = handler;
   }
 
   // Update game objects

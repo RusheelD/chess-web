@@ -1,9 +1,9 @@
 ._7 {
-    --flip: 1;
+    --flip: 0.5;
 }
 
 ._2 {
-    --flip: 0;
+    --flip: -0.5;
 }
 
 ._9 {
@@ -68,10 +68,10 @@
 
 .promo {
     position: absolute;
-    right: calc(var(--offset) * var(--piece-width) * var(--piece-scale) - 40px);
-    top: calc(var(--piece-height) * var(--piece-scale) + 48px);
+    right: calc( var(--offset) * var(--piece-width) * var(--piece-scale) + (320px * var(--piece-scale) / 0.4));
+    top: calc( var(--piece-height) * var(--piece-scale) - (62px * var(--piece-scale) / 0.4));
     pointer-events: all;
-    visibility: hidden;
+    visibility: show;
 }
 
 .q {

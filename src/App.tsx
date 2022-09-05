@@ -16,6 +16,9 @@ function Game() {
   const [board, setBoard] = useState(
     userContext.gameContext ? userContext.gameContext.board : null
   );
+  const [promotion, setPromotion] = useState(
+    userContext.gameContext ? userContext.gameContext.board.promotion : null
+  );
   const [resetKey, setResetKey] = useState(false);
 
   useEffect(() => {
@@ -38,6 +41,18 @@ function Game() {
     }
   });
 
+  useEffect(() => {
+    function updatePromotion() {
+      setPromotion(
+        userContext.gameContext ? userContext.gameContext.board.promotion : null
+      );
+    }
+
+    if (userContext.gameClient) {
+      userContext.gameClient.setPromotionChangeHandler(updatePromotion);
+    }
+  });
+
   return (
     <div className="App">
       <div className="App-header">
@@ -52,31 +67,35 @@ function Game() {
           Reset
         </button>
       </div>
-      {userContext.enableTestMode ? <Play /> : null}
-      {userContext.gameContext && board ? (
-        <Board
-          {...board}
-          resetKey={resetKey}
-          gameClient={userContext.gameClient}
-          onSelectTile={userContext.gameClient!.handleSelectTile.bind(
-            userContext.gameClient!
-          )}
-        />
-      ) : undefined}
+      <div style={{ position: "relative" }}>
+        {userContext.enableTestMode ? <Play /> : null}
+        {userContext.gameContext && board ? (
+          <Board
+            {...board}
+            resetKey={resetKey}
+            gameClient={userContext.gameClient}
+            onSelectTile={userContext.gameClient!.handleSelectTile.bind(
+              userContext.gameClient!
+            )}
+          />
+        ) : undefined}
+        {promotion ? (
+          <Promotion
+            {...promotion}
+            onSelectPromotion={userContext.gameClient!.handleSelectPromotion.bind(
+              userContext.gameClient!
+            )}
+          />
+        ) : undefined}
+      </div>
       <div>
         {board ? <DeadPieces {...board.deadWhite} /> : undefined}
         {board ? <DeadPieces {...board.deadBlack} /> : undefined}
       </div>
-      {board ? (
-        <Promotion
-          {...board.promotion}
-          onSelectPromotion={userContext.gameClient!.handleSelectPromotion.bind(
-            userContext.gameClient!
-          )}
-        />
-      ) : undefined}
+
       <Promotion
-        {...board!.promotion}
+        location={"q7"}
+        color={"white"}
         onSelectPromotion={userContext.gameClient!.handleSelectPromotion.bind(
           userContext.gameClient!
         )}

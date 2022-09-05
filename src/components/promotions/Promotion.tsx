@@ -1,14 +1,19 @@
+import { useEffect, useState } from "react";
 import { PromotionProps, TileInfo, TileProps } from "../../models";
 import { Tile } from "../tiles/Tile";
 import "./Promotion.css";
 
 export function Promotion(props: PromotionProps) {
-  let location = props.location;
-  if (location === "" && props.color === "") {
-    location = "q9";
-  }
+  let [location, setLocation] = useState(props.location);
+  useEffect(() => {
+    setLocation(props.location);
+    if (props.location === "" && props.color === "") {
+      setLocation("q9");
+    }
+  }, [props.location, props.color]);
+
   let promoClasses = "promo " + location.charAt(0) + " _" + location.charAt(1);
-  let rank = location.charAt(1);
+  let rank = (parseInt(location.charAt(1)) + 1).toString();
   let base: TileInfo = {
     rank: rank,
     file: location.charAt(0),
