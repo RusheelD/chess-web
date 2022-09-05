@@ -15,6 +15,8 @@ export function Tile(props: TileProps) {
   const [inCheck, setInCheck] = useState(props.isCheck);
   const [checkmate, setCheckmate] = useState(props.isCheckmate);
   const [stalemate, setStalemate] = useState(props.isStalemate);
+  const [promotion, setPromotion] = useState(props.isPromotion);
+  const [transparent, setTransparent] = useState(props.isTransparent);
 
   useEffect(() => {
     setSelected(props.isSelected);
@@ -44,8 +46,18 @@ export function Tile(props: TileProps) {
     setStalemate(props.isStalemate);
   }, [props.isStalemate]);
 
+  useEffect(() => {
+    setPromotion(props.isPromotion);
+  }, [props.isPromotion]);
+
+  useEffect(() => {
+    setTransparent(props.isTransparent);
+  }, [props.isTransparent]);
+
   let tileClasses = colorCode ? "whiteTile " : "blackTile ";
   tileClasses += selected ? "clicked " : "";
+  tileClasses += transparent ? "transparent " : "";
+  tileClasses += promotion ? "promotion " : "";
 
   let spanClasses = props.file + " _" + props.rank + " ";
   spanClasses += recentlyMoved ? "recentlyMoved " : "";

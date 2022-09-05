@@ -13,6 +13,15 @@ export enum GameMode {
   Synchronic,
 }
 
+export interface StartInfo {
+  context: UserContext;
+  updateStart: (x: boolean) => void;
+}
+
+export interface EndInfo {
+  context: UserContext;
+}
+
 export interface PieceInfo {
   color: string;
   name: string;
@@ -31,6 +40,8 @@ export interface TileInfo {
   isCheck: boolean;
   isCheckmate: boolean;
   isStalemate: boolean;
+  isPromotion: boolean;
+  isTransparent: boolean;
 }
 
 export interface BoardInfo {
@@ -48,6 +59,12 @@ export interface BoardInfo {
 export interface DeadInfo {
   color: string;
   pieces: PieceInfo[];
+}
+
+export interface PromotionInfo {
+  color: string;
+  location: string;
+  onSelectPromotion(tile: TileInfo): void;
 }
 
 export interface Move {
@@ -75,6 +92,8 @@ export interface ChessGame {
   moves: Move[]; // all the moves made so far in the game
   firstPlayer: Player;
   secondPlayer: Player;
+  isOver: boolean;
+  isStarted: boolean;
 }
 
 export interface GameContext {

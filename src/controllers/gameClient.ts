@@ -16,6 +16,8 @@ export class GameClient {
   gameContext: GameContext;
   updateCallback?: () => void;
   playerTurnChangeCallback?: () => void;
+  gameStartedCallback?: () => void;
+  gameEndedCallback?: () => void;
 
   constructor(gameContext: GameContext) {
     this.gameContext = gameContext;
@@ -32,6 +34,8 @@ export class GameClient {
     });
     let raw_data = await res.json();
     this.loadClient(raw_data);
+    this.updateGameStarted();
+    this.updateGameOver();
   }
 
   async getBackendBoard(): Promise<void> {
@@ -54,7 +58,6 @@ export class GameClient {
       checkmate: raw_data.checkmate,
       stalemate: raw_data.stalemate,
     };
-    console.log(data);
     if (data.currentPlayer === "white") {
       this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
       if (this.playerTurnChangeCallback) {
@@ -67,6 +70,11 @@ export class GameClient {
         this.playerTurnChangeCallback();
       }
     }
+
+    this.gameContext.game.isOver = false;
+    this.gameContext.game.isStarted = false;
+    this.gameContext.board.inCheck = undefined;
+    this.gameContext.board.inStalemate = undefined;
 
     this.gameContext.board.deadWhite = {
       color: "white",
@@ -116,12 +124,19 @@ export class GameClient {
     for (let tile of loadLocations(this.gameContext.board, data.checkmate)) {
       tile.isCheckmate = true;
       this.gameContext.board.inCheck = tile;
+      this.gameContext.game.isOver = true;
     }
     for (let tile of loadLocations(this.gameContext.board, data.stalemate)) {
       tile.isStalemate = true;
+      this.gameContext.game.isOver = true;
     }
 
-    loadBoard(data.fen, data.moveCounts, this.gameContext.board);
+    loadBoard(
+      data.fen,
+      data.moveCounts,
+      this.gameContext.board,
+      this.gameContext.game
+    );
     this.gameContext.board = { ...this.gameContext.board };
     this.updateBoard();
   }
@@ -136,7 +151,7 @@ export class GameClient {
       headers: {
         "content-type": "application/json;charset=UTF-8",
       },
-      body: JSON.stringify({ tile: tile.file + tile.rank }),
+      body: JSON.stringify({ tile: tile.file + tile.rank, choice: "Queen" }),
     });
 
     // No selected tile and clicked on an empty tile
@@ -197,6 +212,7 @@ export class GameClient {
       let king = this.gameContext.board.inCheck;
       let kings = this.gameContext.board.inStalemate;
       if (king) {
+        this.gameContext.game.isOver = true;
         if (
           getAllValidMoves(
             this.gameContext.game,
@@ -212,6 +228,7 @@ export class GameClient {
         }
       }
       if (kings) {
+        this.gameContext.game.isOver = true;
         kings.forEach((king) => {
           king.isStalemate = true;
           tilesToUpdate.push(king);
@@ -229,6 +246,18 @@ export class GameClient {
   updateBoard() {
     if (this.updateCallback) {
       this.updateCallback();
+    }
+  }
+
+  updateGameStarted() {
+    if (this.gameStartedCallback) {
+      this.gameStartedCallback();
+    }
+  }
+
+  updateGameOver() {
+    if (this.gameEndedCallback) {
+      this.gameEndedCallback();
     }
   }
 
@@ -259,6 +288,19 @@ export class GameClient {
 
       if (this.playerTurnChangeCallback) {
         this.playerTurnChangeCallback();
+      }
+      let checkmate =
+        this.gameContext.board.inCheck &&
+        getAllValidMoves(
+          this.gameContext.game,
+          this.gameContext.board,
+          this.gameContext.board.inCheck.piece!.color
+        ).length === 0;
+      let stalemate = this.gameContext.board.inStalemate !== undefined;
+      if (checkmate || stalemate) {
+        if (this.gameEndedCallback) {
+          this.gameEndedCallback();
+        }
       }
     }
 
@@ -323,6 +365,8 @@ export class GameClient {
     let res = await fetch("/reset");
     let raw_data = await res.json();
     this.loadClient(raw_data);
+    this.updateGameStarted();
+    this.updateGameOver();
   }
 
   // computeValidMoves(): TileInfo[] {
@@ -376,6 +420,16 @@ export class GameClient {
     selectedTile.piece = undefined;
     selectedTile.isRecentlyMoved = true;
 
+    // Auto-Promote Pawn to Queen
+    if (targetTile.piece?.name === "pawn") {
+      if (
+        (targetTile.rank === "8" && targetTile.piece.color === "white") ||
+        (targetTile.rank === "1" && targetTile.piece.color === "black")
+      ) {
+        targetTile.piece.name = "queen";
+      }
+    }
+
     // Special move for castling
     let castle = checkCastleAndGetRook(
       this.gameContext.board,
@@ -416,6 +470,14 @@ export class GameClient {
   // Update handlers
   setPlayerTurnChangeHandler(handler: () => void) {
     this.playerTurnChangeCallback = handler;
+  }
+
+  setGameStartedHandler(handler: () => void) {
+    this.gameStartedCallback = handler;
+  }
+
+  setGameEndedHandler(handler: () => void) {
+    this.gameEndedCallback = handler;
   }
 
   setBoardUpdateHandler(handler: () => void) {

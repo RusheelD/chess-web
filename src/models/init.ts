@@ -11,6 +11,7 @@ import {
 import { GameClient } from "../controllers";
 
 export function fromFen(
+  game: ChessGame,
   fen: string,
   moveFen: string | undefined
 ): Map<string, PieceInfo> {
@@ -54,6 +55,9 @@ export function fromFen(
       let moveCount = moveRow
         ? parseInt(moveRow.split(",")[j + offset])
         : undefined;
+      if (moveCount && moveCount > 0) {
+        game.isStarted = true;
+      }
       map.set(String.fromCharCode(97 + j + offset) + (8 - i), {
         color: color,
         name: name,
@@ -118,9 +122,10 @@ export function loadLocations(board: BoardInfo, locations: string): TileInfo[] {
 export function loadBoard(
   fen: string,
   moveFen: string,
-  board: BoardInfo
+  board: BoardInfo,
+  game: ChessGame
 ): void {
-  let pieceMap = fromFen(fen, moveFen);
+  let pieceMap = fromFen(game, fen, moveFen);
 
   for (let file of [...Array(8)].map((_, k) => String.fromCharCode(k + 97))) {
     for (let rank = 1; rank <= 8; rank++) {
@@ -155,6 +160,8 @@ function initializeBoard(isFlipped: boolean): BoardInfo {
         isCheck: false,
         isCheckmate: false,
         isStalemate: false,
+        isPromotion: false,
+        isTransparent: false,
       });
     }
   }
@@ -223,6 +230,8 @@ function createGame(currentUser: User): ChessGame {
       isComputer: false,
     },
     mode: GameMode.Classic,
+    isOver: false,
+    isStarted: false,
   };
 }
 

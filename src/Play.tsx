@@ -30,6 +30,8 @@ export function Play() {
         isCheck={false}
         isCheckmate={false}
         isStalemate={false}
+        isPromotion={false}
+        isTransparent={false}
         onSelect={() => {
           console.log("Clicked a tile!!");
         }}

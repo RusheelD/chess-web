@@ -28,7 +28,7 @@ class GameControl(object):
         elif ([row, column] in self.selected_piece.get_valid_moves()):
             self.recent_move = [[self.selected_piece.row,
                                  self.selected_piece.column], [row, column]]
-            self.selected_piece.move(row, column)
+            self.selected_piece.move(row, column, choice=choice)
             self.copy_recent_move()
             self.color_to_move = abs(self.color_to_move - 1)
             self.is_piece_selected = False

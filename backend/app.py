@@ -79,8 +79,9 @@ def select():
             return
         data = dict(flask.request.json)
         tile = data.get('tile')
+        choice = data.get('choice')
         tup = (int(tile[1]) - 1, ord(tile[0])-97)
-        app_manager.game.select_tile(tup[0], tup[1])
+        app_manager.game.select_tile(tup[0], tup[1], choice=choice)
     return "selected"
 
 
