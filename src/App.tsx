@@ -67,7 +67,14 @@ function Game() {
           Reset
         </button>
       </div>
-      <div style={{ position: "relative" }}>
+      <div
+        style={{
+          position: "relative",
+          width: "calc(var(--piece-scale)*var(--piece-width)*11.15)",
+          textAlign: "center",
+          display: "inline-block",
+        }}
+      >
         {userContext.enableTestMode ? <Play /> : null}
         {userContext.gameContext && board ? (
           <Board
@@ -92,14 +99,6 @@ function Game() {
         {board ? <DeadPieces {...board.deadWhite} /> : undefined}
         {board ? <DeadPieces {...board.deadBlack} /> : undefined}
       </div>
-
-      <Promotion
-        location={"q7"}
-        color={"white"}
-        onSelectPromotion={userContext.gameClient!.handleSelectPromotion.bind(
-          userContext.gameClient!
-        )}
-      />
     </div>
   );
 }

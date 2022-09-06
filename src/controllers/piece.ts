@@ -175,7 +175,8 @@ export function checkEnpassantKillAndGetDeadTile(
       enpTile.piece === lastMove.piece && // If the last move is the same as the enp piece
       from &&
       to &&
-      Math.abs(toRowCol(from)[0] - toRowCol(to)[0]) === 2
+      Math.abs(toRowCol(from)[0] - toRowCol(to)[0]) === 2 &&
+      enpTile.piece.name === "pawn"
     ) {
       // And it moved two pieces
 

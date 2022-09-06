@@ -12,7 +12,8 @@ export function Promotion(props: PromotionProps) {
     }
   }, [props.location, props.color]);
 
-  let promoClasses = "promo " + location.charAt(0) + " _" + location.charAt(1);
+  let promoClasses =
+    "promo __" + location.charAt(0).toUpperCase() + " __" + location.charAt(1);
   let rank = (parseInt(location.charAt(1)) + 1).toString();
   let base: TileInfo = {
     rank: rank,

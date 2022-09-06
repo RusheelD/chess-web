@@ -1,45 +1,46 @@
-._7 {
-    --flip: 0.5;
+.__7 {
+    --flip: 0;
 }
 
-._2 {
-    --flip: -0.5;
+.__2 {
+    --flip: -1;
 }
 
-._9 {
+.__9 {
     --flip: 20;
+    --offset: 20;
 }
 
-.a {
-    --offset: calc(7 * var(--flip)+1);
+.__A {
+    --offset: 1;
 }
 
-.b {
-    --offset: calc(5 * var(--flip)+2);
+.__B {
+    --offset: 2;
 }
 
-.c {
-    --offset: calc(3 * var(--flip)+3);
+.__C {
+    --offset: 3;
 }
 
-.d {
-    --offset: calc(1 * var(--flip)+4);
+.__D {
+    --offset: 4;
 }
 
-.e {
-    --offset: calc(-1 * var(--flip)+5);
+.__E {
+    --offset: 5;
 }
 
-.f {
-    --offset: calc(-3 * var(--flip)+6);
+.__F {
+    --offset: 6;
 }
 
-.g {
-    --offset: calc(-5 * var(--flip)+7);
+.__G {
+    --offset: 7;
 }
 
-.h {
-    --offset: calc(-7 * var(--flip)+8);
+.__H {
+    --offset: 8;
 }
 
 .above {
@@ -68,13 +69,13 @@
 
 .promo {
     position: absolute;
-    right: calc( var(--offset) * var(--piece-width) * var(--piece-scale) + (320px * var(--piece-scale) / 0.4));
-    top: calc( var(--piece-height) * var(--piece-scale) - (62px * var(--piece-scale) / 0.4));
+    left: calc( ( max( calc(0 - (var(--offset) - 9 * var(--flip) * var(--flip))), calc(var(--offset) - 9 * var(--flip) * var(--flip))) - 0.5) * var(--piece-width) * var(--piece-scale));
+    top: 18px;
     pointer-events: all;
     visibility: show;
 }
 
-.q {
+.__Q {
     pointer-events: none;
     visibility: hidden;
 }
