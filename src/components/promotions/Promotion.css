@@ -72,7 +72,7 @@
     left: calc( ( max( calc(0 - (var(--offset) - 9 * var(--flip) * var(--flip))), calc(var(--offset) - 9 * var(--flip) * var(--flip))) - 0.5) * var(--piece-width) * var(--piece-scale));
     top: 18px;
     pointer-events: all;
-    visibility: show;
+    visibility: visible;
 }
 
 .__Q {

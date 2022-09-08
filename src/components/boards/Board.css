@@ -15,3 +15,43 @@ div {
     vertical-align: top;
     text-align: center;
 }
+
+.promotionScreen {
+    visibility: show;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--piece-width) * var(--piece-scale) * 0.9);
+    height: calc(var(--piece-height) * var(--piece-scale) * 0.9);
+    background-color: rgba(130, 130, 130, 0.6);
+    border: 4px solid transparent;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.cell {
+    display: inline-block;
+    position: relative;
+}
+
+.texture {
+    --tex: 0.815;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--piece-width) * var(--piece-scale) * var(--tex));
+    height: calc(var(--piece-height) * var(--piece-scale) * var(--tex));
+    border: 4px solid transparent;
+    pointer-events: none;
+}
+
+.light {
+    background-color: rgba(75, 75, 75, 0.1);
+}
+
+.dark {
+    background-color: rgba(255, 255, 255, 0.1);
+}

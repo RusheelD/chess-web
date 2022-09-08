@@ -284,6 +284,31 @@ export class PawnController implements IPieceController {
     let validMoves: TileInfo[] = [];
     let multiplier = currentTile.piece!.color === "white" ? 1 : -1;
 
+    // Pawn attacks including enpassant
+    for (let move of [
+      [row + 1 * multiplier, col + 1],
+      [row + 1 * multiplier, col - 1],
+    ]) {
+      if (isInBounds(move)) {
+        let targetTile = getTile(board, move);
+        if (targetTile.piece) {
+          validMoves.push(targetTile);
+        }
+      }
+    }
+
+    return validMoves;
+  }
+
+  computeAllValidMoves(
+    game: ChessGame,
+    board: BoardInfo,
+    currentTile: TileInfo
+  ): TileInfo[] {
+    let [row, col] = toRowCol(currentTile);
+    let validMoves: TileInfo[] = [];
+    let multiplier = currentTile.piece!.color === "white" ? 1 : -1;
+
     // Linear movement
     let tile = getTile(board, [row + 1 * multiplier, col]);
     if (!tile.piece) {
@@ -326,7 +351,7 @@ export class PawnController implements IPieceController {
     board: BoardInfo,
     currentTile: TileInfo
   ): TileInfo[] {
-    let moves: TileInfo[] = this.computeAttackMoves(game, board, currentTile);
+    let moves: TileInfo[] = this.computeAllValidMoves(game, board, currentTile);
     return removeInvalidMoves(game, board, moves, currentTile);
   }
 }

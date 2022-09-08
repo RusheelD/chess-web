@@ -101,6 +101,7 @@ export interface ChessGame {
   secondPlayer: Player;
   isOver: boolean;
   isStarted: boolean;
+  gameCode?: string;
 }
 
 export interface GameContext {

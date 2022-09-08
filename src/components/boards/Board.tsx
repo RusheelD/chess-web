@@ -5,6 +5,9 @@ import "./Board.css";
 
 export function Board(props: BoardProps) {
   const [tiles, setTiles] = useState(props.tiles);
+  const [overlay, setOverlay] = useState(
+    props.inPromotion ? "promotionScreen" : "invisible"
+  );
 
   useEffect(() => {
     setTiles(props.tiles);
@@ -15,6 +18,14 @@ export function Board(props: BoardProps) {
     props.resetKey,
     props.promotion,
   ]);
+
+  useEffect(() => {
+    if (props.inPromotion) {
+      setOverlay("promotionScreen");
+    } else {
+      setOverlay("invisible");
+    }
+  }, [props.inPromotion]);
 
   const factor =
     props.gameClient!.gameContext.playerToPlay ===
@@ -33,13 +44,32 @@ export function Board(props: BoardProps) {
                 Math.abs(7 * Math.abs(factor) - col) + 97
               );
               const tileInfo = tiles.get(file + rank)!;
+              let colorCode =
+                ((parseInt(tileInfo.rank) % 2) +
+                  ((tileInfo.file.toLowerCase().charCodeAt(0) - 96) % 2)) %
+                2;
 
               return (
-                <Tile
-                  key={"__game_cell_" + file + rank}
-                  {...tileInfo}
-                  onSelect={() => props.onSelectTile(tileInfo)}
-                />
+                <div className="cell">
+                  <Tile
+                    key={"__game_cell_" + file + rank}
+                    {...tileInfo}
+                    onSelect={() => props.onSelectTile(tileInfo)}
+                  />
+                  <div
+                    className={"texture " + (colorCode ? "light" : "dark")}
+                  />
+                  <div
+                    className={
+                      props.inPromotion
+                        ? file + rank !==
+                          props.inPromotion?.file + props.inPromotion?.rank
+                          ? overlay
+                          : "invisible"
+                        : "invisible"
+                    }
+                  />
+                </div>
               );
             })}
           </div>

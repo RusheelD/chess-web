@@ -16,7 +16,7 @@ class AppManager():
     def __init__(self, app):
         self.app = app
         self.updated_data = None
-        self.game = None
+        self.games = {}
 
     def updateLogout(self):
         self.can_logout = not (self.can_logout)
@@ -40,55 +40,65 @@ def index():
 
 @app_manager.app.route("/make", methods=['GET', 'POST'])
 def make():
-    if app_manager.game is None:
-        if flask.request.method == 'POST':
-            data = dict(flask.request.json)
-            mode = data.get('mode')
-            if (mode == 'synchronic'):
-                app_manager.game = MultiGameControl()
-            elif (mode == 'oneplayer'):
-                app_manager.game = AIControl()
-            else:
-                app_manager.game = GameControl()
-            return board()
-        app_manager.game = GameControl()
-    return board()
+    data = dict(flask.request.json)
+    if data.get('code') not in app_manager.games:
+        mode = data.get('mode')
+        if (mode == 'synchronic'):
+            app_manager.games[data.get('code')] = [MultiGameControl(), 0]
+        elif (mode == 'oneplayer'):
+            app_manager.games[data.get('code')] = [AIControl(), 0]
+        else:
+            app_manager.games[data.get('code')] = [GameControl(), 0]
+        return board(code=data.get('code'))
+    app_manager.games[data.get('code')][1] += 1
+    return board(code=data.get('code'))
 
 
 @app_manager.app.route("/board", methods=["GET", "POST"])
-def board():
+def board(code=None):
+    game = None
+    if (code):
+        game = app_manager.games[code][0]
+    else:
+        data = dict(flask.request.json)
+        code = data.get('code')
+        game = app_manager.games[data.get('code')]
     return {
-        "board": app_manager.game.main_board.to_fen(),
-        "possible": app_manager.game.main_board.format_valid_moves(app_manager.game.selected_piece),
-        "dead_white": app_manager.game.main_board.get_dead()[0],
-        "dead_black": app_manager.game.main_board.get_dead()[1],
-        "move_counts": app_manager.game.main_board.move_count_fen(),
-        "recent": app_manager.game.send_recent(),
-        "current_player": app_manager.game.current_player(),
-        "current_piece": app_manager.game.current_piece(),
-        "check": app_manager.game.send_check(),
-        "checkmate": app_manager.game.send_checkmate(),
-        "stalemate": app_manager.game.send_stalemate()
+        "board": game.main_board.to_fen(),
+        "possible": game.main_board.format_valid_moves(game.selected_piece),
+        "dead_white": game.main_board.get_dead()[0],
+        "dead_black": game.main_board.get_dead()[1],
+        "move_counts": game.main_board.move_count_fen(),
+        "recent": game.send_recent(),
+        "current_player": game.current_player(),
+        "current_piece": game.current_piece(),
+        "check": game.send_check(),
+        "checkmate": game.send_checkmate(),
+        "stalemate": game.send_stalemate(),
+        "logged": app_manager.games[code][1]
     }
 
 
 @app_manager.app.route("/select", methods=['GET', 'POST'])
 def select():
+    data = dict(flask.request.json)
+    game = app_manager.games[data.get('code')][0]
     if (flask.request.method == 'POST'):
-        if (app_manager.game is None):
+        if (game is None):
             return
-        data = dict(flask.request.json)
         tile = data.get('tile')
         choice = data.get('choice')
         tup = (int(tile[1]) - 1, ord(tile[0])-97)
-        app_manager.game.select_tile(tup[0], tup[1], choice=choice)
+        game.select_tile(tup[0], tup[1], choice=choice)
     return "selected"
 
 
 @app_manager.app.route("/reset", methods=['GET', 'POST'])
 def reset():
-    app_manager.game = type(app_manager.game)()
-    return board()
+    data = dict(flask.request.json)
+    game = app_manager.games[data.get('code')][0]
+    app_manager.games[data.get('code')] = [type(game)(), 0]
+    return board(code=data.get('code'))
 
 
 @app_manager.app.route("/synchronic")

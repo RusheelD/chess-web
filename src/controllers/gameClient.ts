@@ -6,8 +6,6 @@ import {
   kingsInCheck,
   pieceControllers,
   stalemate,
-} from "./piece";
-import {
   checkCastleAndGetRook,
   checkEnpassantKillAndGetDeadTile,
 } from "./piece";
@@ -22,6 +20,15 @@ export class GameClient {
 
   constructor(gameContext: GameContext) {
     this.gameContext = gameContext;
+    let params = new URLSearchParams(window.location.search);
+    if (params.has("code") && params.get("code") !== null) {
+      this.gameContext.game.isOver = false;
+      this.gameContext.game.isStarted = true;
+      this.gameContext.game.gameCode = params.get("code")!;
+    } else {
+      this.gameContext.game.isOver = false;
+      this.gameContext.game.isStarted = false;
+    }
     this.initialize();
   }
 
@@ -31,7 +38,12 @@ export class GameClient {
       headers: {
         "content-type": "application/json;charset=UTF-8",
       },
-      body: JSON.stringify({ mode: "twoplayer" }),
+      body: JSON.stringify({
+        mode: "twoplayer",
+        code: this.gameContext.game.gameCode
+          ? this.gameContext.game.gameCode
+          : "",
+      }),
     });
     let raw_data = await res.json();
     this.loadClient(raw_data);
@@ -40,7 +52,18 @@ export class GameClient {
   }
 
   async getBackendBoard(): Promise<void> {
-    let res = await fetch("/board");
+    let res = await fetch("/board", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+      },
+      body: JSON.stringify({
+        mode: "twoplayer",
+        code: this.gameContext.game.gameCode
+          ? this.gameContext.game.gameCode
+          : "",
+      }),
+    });
     let raw_data = await res.json();
     this.loadClient(raw_data);
   }
@@ -72,8 +95,6 @@ export class GameClient {
       }
     }
 
-    this.gameContext.game.isOver = false;
-    this.gameContext.game.isStarted = false;
     this.gameContext.board.inCheck = undefined;
     this.gameContext.board.inStalemate = undefined;
     this.gameContext.board.inPromotion = undefined;
@@ -224,6 +245,9 @@ export class GameClient {
       body: JSON.stringify({
         tile: tile.file + tile.rank,
         choice: choice ? choice : "Queen",
+        code: this.gameContext.game.gameCode
+          ? this.gameContext.game.gameCode
+          : "",
       }),
     });
 
@@ -450,23 +474,24 @@ export class GameClient {
   }
 
   async reset(): Promise<void> {
-    let res = await fetch("/reset");
+    window.location.href = window.location.protocol + "/";
+    let res = await fetch("/reset", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+      },
+      body: JSON.stringify({
+        mode: "twoplayer",
+        code: this.gameContext.game.gameCode
+          ? this.gameContext.game.gameCode
+          : "",
+      }),
+    });
     let raw_data = await res.json();
     this.loadClient(raw_data);
     this.updateGameStarted();
     this.updateGameOver();
   }
-
-  // computeValidMoves(): TileInfo[] {
-  //   let data = { possible: "" };
-  //   await fetch("/board").then((res) =>
-  //     res.json().then((raw_data) => {
-  //       data.possible = raw_data.possible;
-  //     })
-  //   );
-  //   return loadLocations(this.gameContext.board, data.possible);
-  //   return [];
-  // }
 
   movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {
     let changedTiles: TileInfo[] = [];
