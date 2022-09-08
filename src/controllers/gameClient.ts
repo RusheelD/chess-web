@@ -1,4 +1,10 @@
-import { getDead, loadBoard, loadLocations } from "../models";
+import {
+  GameMode,
+  getDead,
+  loadBoard,
+  loadLocations,
+  PlayMode,
+} from "../models";
 import { GameContext, Move, TileInfo } from "../models/core";
 import { log } from "../utils";
 import {
@@ -28,6 +34,35 @@ export class GameClient {
     } else {
       this.gameContext.game.isOver = false;
       this.gameContext.game.isStarted = false;
+    }
+    if (params.has("gamemode") && params.get("gamemode") !== null) {
+      let mode = params.get("gamemode")!;
+      switch (mode) {
+        case "Classic":
+          this.gameContext.game.mode = GameMode.Classic;
+          break;
+        case "Synchronic":
+          this.gameContext.game.mode = GameMode.Synchronic;
+          break;
+        default:
+          this.gameContext.game.mode = GameMode.Classic;
+      }
+    }
+    if (params.has("playmode") && params.get("playmode") !== null) {
+      let mode = params.get("playmode")!;
+      switch (mode) {
+        case "pass":
+          this.gameContext.playMode = PlayMode.PassAndPlay;
+          break;
+        case "network":
+          this.gameContext.playMode = PlayMode.Network;
+          break;
+        case "ai":
+          this.gameContext.playMode = PlayMode.WithComputer;
+          break;
+        default:
+          this.gameContext.playMode = PlayMode.PassAndPlay;
+      }
     }
     this.initialize();
   }
