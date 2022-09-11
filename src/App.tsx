@@ -8,6 +8,8 @@ import { DeadPieces } from "./components/dead-pieces/DeadPieces";
 import { Promotion } from "./components/promotions/Promotion";
 import { Start } from "./components/starts/Start";
 import { End } from "./components/ends/End";
+import * as io from "socket.io-client";
+const socket = io.connect("http://127.0.0.1:5000");
 
 function Game() {
   const [currentPlayer, setCurrentPlayer] = useState(
@@ -30,6 +32,13 @@ function Game() {
       userContext.gameClient.setPlayerTurnChangeHandler(updateCurrentPlayer);
     }
   });
+
+  useEffect(() => {
+    socket.on("select", (board: any) => {
+      userContext.gameClient?.loadClient(board);
+      console.log("got");
+    });
+  }, []);
 
   useEffect(() => {
     function updateBoard() {

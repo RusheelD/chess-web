@@ -5,7 +5,7 @@ import {
   loadLocations,
   PlayMode,
 } from "../models";
-import { GameContext, Move, TileInfo } from "../models/core";
+import { GameContext, Move, TileInfo, UserContext } from "../models/core";
 import { log } from "../utils";
 import {
   getAllValidMoves,
@@ -16,16 +16,22 @@ import {
   checkEnpassantKillAndGetDeadTile,
 } from "./piece";
 
+import * as io from "socket.io-client";
+
 export class GameClient {
   gameContext: GameContext;
+  userContext?: UserContext;
   updateCallback?: () => void;
   playerTurnChangeCallback?: () => void;
   gameStartedCallback?: () => void;
   gameEndedCallback?: () => void;
   promotionChangeCallback?: () => void;
+  socket: any;
 
-  constructor(gameContext: GameContext) {
+  constructor(gameContext: GameContext, userContext: UserContext | undefined) {
     this.gameContext = gameContext;
+    this.userContext = userContext;
+    this.socket = io.connect("http://10.1.1.198:5000");
     let params = new URLSearchParams(window.location.search);
     if (params.has("code") && params.get("code") !== null) {
       this.gameContext.game.isOver = false;
@@ -64,20 +70,59 @@ export class GameClient {
           this.gameContext.playMode = PlayMode.PassAndPlay;
       }
     }
+    if (params.has("usercode") && params.get("usercode") !== null) {
+      let userCode = params.get("usercode");
+      if (this.userContext) {
+        this.userContext.user.code = userCode!;
+      }
+    }
     this.initialize();
   }
 
   async initialize(): Promise<void> {
+    let gamemode;
+    let playmode;
+    switch (
+      this.gameContext.game.mode ? this.gameContext.game.mode : GameMode.Classic
+    ) {
+      case GameMode.Classic:
+        gamemode = "classic";
+        break;
+      case GameMode.Synchronic:
+        gamemode = "synchronic";
+        break;
+      default:
+        gamemode = "classic";
+        break;
+    }
+    switch (this.gameContext.playMode) {
+      case PlayMode.PassAndPlay:
+        playmode = "pass";
+        break;
+      case PlayMode.Network:
+        playmode = "network";
+        break;
+      case PlayMode.WithComputer:
+        playmode = "ai";
+        break;
+      default:
+        playmode = "pass";
+        break;
+    }
     let res = await fetch("/make", {
       method: "POST",
       headers: {
         "content-type": "application/json;charset=UTF-8",
       },
       body: JSON.stringify({
-        mode: "twoplayer",
+        mode: gamemode,
+        type: playmode,
         code: this.gameContext.game.gameCode
           ? this.gameContext.game.gameCode
           : "",
+        usercode: this.userContext ? this.userContext.user.code : "",
+        name: this.userContext ? this.userContext.user.name : "",
+        id: this.userContext ? this.userContext.user.id : "",
       }),
     });
     let raw_data = await res.json();
@@ -116,6 +161,8 @@ export class GameClient {
       check: raw_data.check,
       checkmate: raw_data.checkmate,
       stalemate: raw_data.stalemate,
+      logged: raw_data.logged,
+      users: raw_data.users,
     };
     if (data.currentPlayer === "white") {
       this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
@@ -285,6 +332,8 @@ export class GameClient {
           : "",
       }),
     });
+
+    this.socket.emit("select", tile.file + tile.rank);
 
     // No selected tile and clicked on an empty tile
     // do nothing

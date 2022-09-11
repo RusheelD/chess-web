@@ -12,7 +12,8 @@ export function Start(props: StartInfo) {
         window.location.protocol +
         "?code=" +
         Math.floor(Math.random() * 1000000).toString() +
-        "&gamemode=Classic&playmode=pass";
+        "&gamemode=Classic&playmode=pass&usercode=" +
+        Math.floor(Math.random() * 1000000).toString();
       props.context.gameClient.initialize();
     }
     props.updateStart(true);
@@ -31,7 +32,8 @@ export function Start(props: StartInfo) {
             gameCode +
             "&gamemode=" +
             gamemode +
-            "&playmode=network";
+            "&playmode=network&usercode=" +
+            Math.floor(Math.random() * 1000000).toString();
           props.context.gameClient.initialize();
         }
         props.updateStart(true);
