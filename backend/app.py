@@ -122,6 +122,8 @@ def make():
     app_manager.games[gamecode].logins += 1
     if (player.code not in app_manager.games[gamecode].users.players):
         app_manager.games[gamecode].users.add(player)
+    flask_socketio.emit("select", board(data.get('code')),
+                        namespace='/', broadcast=True)
     return board(code=gamecode, usercode=data.get("usercode"))
 
 
@@ -164,7 +166,8 @@ def select():
         tup = (int(tile[1]) - 1, ord(tile[0])-97)
         game.select_tile(tup[0], tup[1], choice=choice)
     if (not (game.is_piece_selected)):
-        flask_socketio.emit("select", board(), namespace='/', broadcast=True)
+        flask_socketio.emit("select", board(data.get('code')),
+                            namespace='/', broadcast=True)
     return "selected"
 
 
@@ -177,10 +180,8 @@ def handle_select(data):
     tup = (int(tile[1]) - 1, ord(tile[0])-97)
     game.select_tile(tup[0], tup[1], choice=choice)
     if (not (game.is_piece_selected)):
-        flask_socketio.emit("select", board(), namespace='/', broadcast=True)
-    else:
-        flask_socketio.emit(
-            "select", {"selected": False}, namespace='/', broadcast=True)
+        flask_socketio.emit("select", board(
+            code), namespace='/', broadcast=True)
 
 
 @app_manager.app.route("/reset", methods=['GET', 'POST'])
