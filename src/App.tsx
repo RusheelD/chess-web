@@ -9,6 +9,7 @@ import { Promotion } from "./components/promotions/Promotion";
 import { Start } from "./components/starts/Start";
 import { End } from "./components/ends/End";
 import * as io from "socket.io-client";
+import { Login } from "./components/logins/Login";
 const socket = io.connect("http://127.0.0.1:5000");
 
 function Game() {
@@ -22,6 +23,7 @@ function Game() {
     userContext.gameContext ? userContext.gameContext.board.promotion : null
   );
   const [resetKey, setResetKey] = useState(false);
+  const [logoutKey, setLogoutKey] = useState(false);
 
   useEffect(() => {
     function updateCurrentPlayer() {
@@ -35,8 +37,10 @@ function Game() {
 
   useEffect(() => {
     socket.on("select", (board: any) => {
-      userContext.gameClient?.loadClient(board);
-      console.log("got");
+      if (!board.selected) {
+        userContext.gameClient?.loadClient(board);
+        console.log("got");
+      }
     });
   }, []);
 
@@ -72,9 +76,18 @@ function Game() {
         Color: {currentPlayer?.colorChosen}
       </div>
       <div>
-        <button onClick={() => onReset(resetKey, setResetKey, userContext)}>
-          Reset
-        </button>
+        <div>
+          <button onClick={() => onReset(resetKey, setResetKey, userContext)}>
+            Reset
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={() => onLogout(logoutKey, setLogoutKey, userContext)}
+          >
+            Logout
+          </button>
+        </div>
       </div>
       <div
         style={{
@@ -113,8 +126,13 @@ function Game() {
 }
 
 function App() {
-  let [started, setStarted] = useState(false);
-  let [ended, setEnded] = useState(false);
+  let [logged, setLogged] = useState(userContext.user.isLogged);
+  let [started, setStarted] = useState(
+    userContext.gameContext ? userContext.gameContext.game.isStarted : false
+  );
+  let [ended, setEnded] = useState(
+    userContext.gameContext ? userContext.gameContext.game.isOver : false
+  );
 
   useEffect(() => {
     function setGameStartedState() {
@@ -136,14 +154,28 @@ function App() {
     }
   });
 
-  return started ? (
-    ended ? (
-      <End context={userContext} />
+  useEffect(() => {
+    function setLoggedState() {
+      setLogged(userContext.user.isLogged);
+    }
+
+    if (userContext.gameClient) {
+      userContext.gameClient.setLoggedHandler(setLoggedState);
+    }
+  });
+
+  return logged ? (
+    started ? (
+      ended ? (
+        <End context={userContext} />
+      ) : (
+        <Game />
+      )
     ) : (
-      <Game />
+      <Start context={userContext} updateStart={setStarted} />
     )
   ) : (
-    <Start context={userContext} updateStart={setStarted} />
+    <Login context={userContext} updateLogged={setLogged} />
   );
 }
 
@@ -154,6 +186,15 @@ async function onReset(
 ) {
   await userContext.gameClient?.reset();
   resetHandler(!resetKey);
+}
+
+async function onLogout(
+  logoutKey: boolean,
+  logoutHandler: (x: boolean) => void,
+  userContext: UserContext
+) {
+  await userContext.gameClient?.logout();
+  logoutHandler(!logoutKey);
 }
 
 export default App;

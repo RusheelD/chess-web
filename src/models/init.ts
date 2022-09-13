@@ -193,6 +193,7 @@ function initialize(): UserContext {
     id: "rusheel@gmail.com",
     name: "Rusheel",
     code: "",
+    isLogged: false,
   };
   const game = createGame(currentUser);
 
@@ -212,9 +213,8 @@ function initialize(): UserContext {
 
   newUserContext.gameClient = new GameClient(
     newUserContext.gameContext!,
-    undefined
+    newUserContext
   );
-  newUserContext.gameClient!.userContext = newUserContext;
   return newUserContext;
 }
 
@@ -226,6 +226,7 @@ function createGame(currentUser: User): ChessGame {
     id: "prakash@gmail.com",
     name: "Prakash",
     code: "",
+    isLogged: false,
   };
 
   return {

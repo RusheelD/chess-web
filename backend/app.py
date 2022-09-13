@@ -20,6 +20,7 @@ class AppManager():
         self.games = {}
         self.socketIo = flask_socketio.SocketIO(
             self.app, cors_allowed_origins='*')
+        self.users = AllPlayersData()
 
 
 class GameData():
@@ -41,6 +42,10 @@ class AllPlayersData():
         self.players = {}
 
     def add(self, player: PlayerData):
+        if (player.code in self.players):
+            return self
+        if (player.code == ""):
+            return self
         if (len(self.players) == 0):
             color = "white"
         elif (len(self.players) == 1):
@@ -50,12 +55,20 @@ class AllPlayersData():
         self.players.update({player.code: {"player": player, "color": color}})
         return self
 
-    def to_dict(self):
+    def to_dict(self, usercode=None):
         ret = {}
         for player in self.players:
-            ret.update({player: {
-                       "player": self.players[player]["player"].name, "color": self.players[player]["color"]}})
+            if player == usercode:
+                d = self.players[player]["player"].__dict__.copy()
+                d.update({"color": self.players[player]["color"]})
+                ret.update({player: d})
+            else:
+                ret.update({player: {
+                    "name": self.players[player]["player"].name, "color": self.players[player]["color"]}})
         return ret
+
+    def __getitem__(self, item):
+        return self.players[item]
 
 
 # Initialize the app manager
@@ -74,17 +87,27 @@ def index():
     return {"status": "OK"}
 
 
+@app_manager.app.route("/add", methods=['GET', 'POST'])
+def add():
+    data = dict(flask.request.json)
+    usercode = data.get("code")
+    username = data.get("name")
+    userid = data.get('id')
+    app_manager.users.add(PlayerData(usercode, username, userid))
+    return app_manager.users.to_dict(usercode)
+
+
 @app_manager.app.route("/make", methods=['GET', 'POST'])
 def make():
     data = dict(flask.request.json)
     gamecode = data.get("code")
-    player = PlayerData(data.get("usercode"), data.get("name"), data.get("id"))
+    player = app_manager.users[data.get('usercode')]["player"]
     if gamecode not in app_manager.games:
         mode = data.get('mode')
         gameType = data.get('type')
         if (mode == 'synchronic'):
             app_manager.games[gamecode] = GameData(
-                MultiGameControl(), 0, [])
+                MultiGameControl(), 0, AllPlayersData().add(player))
         elif (mode == 'classic'):
             if (gameType == 'ai'):
                 app_manager.games[gamecode] = GameData(
@@ -99,17 +122,18 @@ def make():
     app_manager.games[gamecode].logins += 1
     if (player.code not in app_manager.games[gamecode].users.players):
         app_manager.games[gamecode].users.add(player)
-    return board(code=gamecode)
+    return board(code=gamecode, usercode=data.get("usercode"))
 
 
 @app_manager.app.route("/board", methods=["GET", "POST"])
-def board(code=None):
+def board(code=None, usercode=None):
     game = None
     if (code):
         game = app_manager.games[code].game
     else:
         data = dict(flask.request.json)
         code = data.get('code')
+        usercode = data.get('usercode')
         game = app_manager.games[data.get('code')].game
     return {
         "board": game.main_board.to_fen(),
@@ -124,7 +148,7 @@ def board(code=None):
         "checkmate": game.send_checkmate(),
         "stalemate": game.send_stalemate(),
         "logged": app_manager.games[code].logins,
-        "users": app_manager.games[code].users.to_dict()
+        "users": app_manager.games[code].users.to_dict(usercode)
     }
 
 
@@ -154,13 +178,34 @@ def handle_select(data):
     game.select_tile(tup[0], tup[1], choice=choice)
     if (not (game.is_piece_selected)):
         flask_socketio.emit("select", board(), namespace='/', broadcast=True)
+    else:
+        flask_socketio.emit(
+            "select", {"selected": False}, namespace='/', broadcast=True)
 
 
 @app_manager.app.route("/reset", methods=['GET', 'POST'])
 def reset():
     data = dict(flask.request.json)
     game = app_manager.games[data.get('code')].game
-    app_manager.games[data.get('code')] = GameData(type(game)(), 0, game.users)
+    app_manager.games[data.get('code')] = GameData(
+        type(game)(), 0, app_manager.games[data.get('code')].users)
+    return board(code=data.get('code'))
+
+
+@app_manager.app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    data = dict(flask.request.json)
+    code = data.get('usercode')
+    game = app_manager.games[data.get('code')].game
+    app_manager.games[data.get('code')].users.players.pop(code, None)
+    app_manager.users.players.pop(code, None)
+    if (len(app_manager.games[data.get('code')].users.players) == 0):
+        app_manager.games.pop(data.get('code'), None)
+        app_manager.games.update({data.get('code'): GameData(
+            type(game)(), 0, AllPlayersData())})
+    else:
+        app_manager.games[data.get('code')] = GameData(
+            type(game)(), 0, app_manager.games[data.get('code')].users)
     return board(code=data.get('code'))
 
 

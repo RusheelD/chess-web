@@ -20,25 +20,26 @@ import * as io from "socket.io-client";
 
 export class GameClient {
   gameContext: GameContext;
-  userContext?: UserContext;
+  userContext: UserContext;
   updateCallback?: () => void;
   playerTurnChangeCallback?: () => void;
   gameStartedCallback?: () => void;
   gameEndedCallback?: () => void;
+  loggedInCallback?: () => void;
   promotionChangeCallback?: () => void;
   socket: any;
 
-  constructor(gameContext: GameContext, userContext: UserContext | undefined) {
+  constructor(gameContext: GameContext, userContext: UserContext) {
     this.gameContext = gameContext;
     this.userContext = userContext;
+    this.gameContext.game.isOver = false;
+    this.updateGameOver();
     this.socket = io.connect("http://10.1.1.198:5000");
     let params = new URLSearchParams(window.location.search);
     if (params.has("code") && params.get("code") !== null) {
-      this.gameContext.game.isOver = false;
       this.gameContext.game.isStarted = true;
       this.gameContext.game.gameCode = params.get("code")!;
     } else {
-      this.gameContext.game.isOver = false;
       this.gameContext.game.isStarted = false;
     }
     if (params.has("gamemode") && params.get("gamemode") !== null) {
@@ -72,11 +73,24 @@ export class GameClient {
     }
     if (params.has("usercode") && params.get("usercode") !== null) {
       let userCode = params.get("usercode");
-      if (this.userContext) {
-        this.userContext.user.code = userCode!;
-      }
+      this.userContext.user.code = userCode!;
+      this.userContext.user.isLogged = true;
     }
     this.initialize();
+  }
+
+  addUser(): void {
+    fetch("/add", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+      },
+      body: JSON.stringify({
+        code: this.userContext.user.code,
+        name: this.userContext.user.name,
+        id: this.userContext.user.id,
+      }),
+    });
   }
 
   async initialize(): Promise<void> {
@@ -109,26 +123,31 @@ export class GameClient {
         playmode = "pass";
         break;
     }
-    let res = await fetch("/make", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-      },
-      body: JSON.stringify({
-        mode: gamemode,
-        type: playmode,
-        code: this.gameContext.game.gameCode
-          ? this.gameContext.game.gameCode
-          : "",
-        usercode: this.userContext ? this.userContext.user.code : "",
-        name: this.userContext ? this.userContext.user.name : "",
-        id: this.userContext ? this.userContext.user.id : "",
-      }),
-    });
-    let raw_data = await res.json();
-    this.loadClient(raw_data);
-    this.updateGameStarted();
-    this.updateGameOver();
+    if (
+      this.gameContext.game.gameCode &&
+      this.gameContext.game.gameCode !== ""
+    ) {
+      let res = await fetch("/make", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify({
+          mode: gamemode,
+          type: playmode,
+          code: this.gameContext.game.gameCode
+            ? this.gameContext.game.gameCode
+            : "",
+          usercode: this.userContext.user.code,
+          logged: this.userContext.user.isLogged,
+        }),
+      });
+      let raw_data = await res.json();
+      this.loadClient(raw_data);
+      this.updateGameStarted();
+      this.updateGameOver();
+    }
+    this.updateLogged();
   }
 
   async getBackendBoard(): Promise<void> {
@@ -142,6 +161,7 @@ export class GameClient {
         code: this.gameContext.game.gameCode
           ? this.gameContext.game.gameCode
           : "",
+        usercode: this.userContext.user.code,
       }),
     });
     let raw_data = await res.json();
@@ -164,6 +184,38 @@ export class GameClient {
       logged: raw_data.logged,
       users: raw_data.users,
     };
+    let user = data.users[this.userContext.user.code];
+    this.userContext.user.name = user.name;
+    if (user.userId !== undefined) {
+      this.userContext.user.id = user.userId;
+    }
+    if (user.color === "white") {
+      this.gameContext.game.firstPlayer.user = this.userContext.user;
+    } else if (user.color === "black") {
+      this.gameContext.game.secondPlayer.user = this.userContext.user;
+    }
+
+    for (let code in data.users) {
+      let u = data.users[code];
+      if (u.color !== user.color) {
+        if (u.color === "white") {
+          this.gameContext.game.firstPlayer.user = {
+            name: u.name,
+            code: code,
+            id: "",
+            isLogged: true,
+          };
+        } else if (u.color === "black") {
+          this.gameContext.game.secondPlayer.user = {
+            name: u.name,
+            code: code,
+            id: "",
+            isLogged: true,
+          };
+        }
+      }
+    }
+
     if (data.currentPlayer === "white") {
       this.gameContext.playerToPlay = this.gameContext.game.firstPlayer;
       if (this.playerTurnChangeCallback) {
@@ -263,6 +315,12 @@ export class GameClient {
   // The following are the handlers for various events
   // This part needs heavy refactoring ...
   handleSelectTile(tile: TileInfo): void {
+    if (
+      this.gameContext.playMode !== PlayMode.PassAndPlay &&
+      this.gameContext.playerToPlay.user !== this.userContext.user
+    ) {
+      return;
+    }
     let tilesToUpdate = [];
     let selectedTile = this.gameContext.board.selectedTile;
 
@@ -457,6 +515,12 @@ export class GameClient {
     }
   }
 
+  updateLogged() {
+    if (this.loggedInCallback) {
+      this.loggedInCallback();
+    }
+  }
+
   updateTilesOnBoard(
     changedTiles: TileInfo[],
     moveComplete: boolean,
@@ -558,7 +622,8 @@ export class GameClient {
   }
 
   async reset(): Promise<void> {
-    window.location.href = window.location.protocol + "/";
+    window.location.href =
+      window.location.protocol + "/?usercode=" + this.userContext.user.code;
     let res = await fetch("/reset", {
       method: "POST",
       headers: {
@@ -569,12 +634,39 @@ export class GameClient {
         code: this.gameContext.game.gameCode
           ? this.gameContext.game.gameCode
           : "",
+        userCode: this.userContext.user.code,
       }),
     });
     let raw_data = await res.json();
     this.loadClient(raw_data);
     this.updateGameStarted();
     this.updateGameOver();
+    this.updateLogged();
+  }
+
+  async logout(): Promise<void> {
+    window.location.href = window.location.protocol + "/";
+    let res = await fetch("/logout", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+      },
+      body: JSON.stringify({
+        mode: "twoplayer",
+        usercode: this.userContext.user.code,
+        code: this.gameContext.game.gameCode
+          ? this.gameContext.game.gameCode
+          : "",
+        userCode: this.userContext.user.code,
+      }),
+    });
+    this.userContext.user.isLogged = false;
+    let raw_data = await res.json();
+    console.log(raw_data);
+    this.loadClient(raw_data);
+    this.updateGameStarted();
+    this.updateGameOver();
+    this.updateLogged();
   }
 
   movePiece(selectedTile: TileInfo, targetTile: TileInfo): TileInfo[] {
@@ -685,6 +777,10 @@ export class GameClient {
 
   setPromotionChangeHandler(handler: () => void) {
     this.promotionChangeCallback = handler;
+  }
+
+  setLoggedHandler(handler: () => void) {
+    this.loggedInCallback = handler;
   }
 
   // Update game objects

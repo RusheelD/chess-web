@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BoardProps } from "../../models";
+import { BoardProps, PlayMode } from "../../models";
 import { Tile } from "../tiles/Tile";
 import "./Board.css";
 
@@ -8,6 +8,7 @@ export function Board(props: BoardProps) {
   const [overlay, setOverlay] = useState(
     props.inPromotion ? "promotionScreen" : "invisible"
   );
+  let factor = 0;
 
   useEffect(() => {
     setTiles(props.tiles);
@@ -27,11 +28,25 @@ export function Board(props: BoardProps) {
     }
   }, [props.inPromotion]);
 
-  const factor =
-    props.gameClient!.gameContext.playerToPlay ===
-    props.gameClient!.gameContext.game.firstPlayer
-      ? 0
-      : 1;
+  if (
+    props.gameClient?.gameContext.playMode === PlayMode.PassAndPlay ||
+    (props.gameClient?.userContext.user !==
+      props.gameClient?.gameContext.game.firstPlayer.user &&
+      props.gameClient?.userContext.user !==
+        props.gameClient?.gameContext.game.secondPlayer.user)
+  ) {
+    factor =
+      props.gameClient!.gameContext.playerToPlay ===
+      props.gameClient!.gameContext.game.firstPlayer
+        ? 0
+        : 1;
+  } else {
+    factor =
+      props.gameClient!.userContext.user ===
+      props.gameClient!.gameContext.game.firstPlayer.user!
+        ? 0
+        : 1;
+  }
 
   return (
     <div className="board">

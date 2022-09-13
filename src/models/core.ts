@@ -22,6 +22,11 @@ export interface EndInfo {
   context: UserContext;
 }
 
+export interface LoginInfo {
+  context: UserContext;
+  updateLogged: (x: boolean) => void;
+}
+
 export interface PieceInfo {
   color: string;
   name: string;
@@ -87,6 +92,7 @@ export interface User {
   id: string;
   name: string;
   code: string;
+  isLogged: boolean;
 }
 
 export interface Player {

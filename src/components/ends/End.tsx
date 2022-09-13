@@ -10,9 +10,10 @@ export function End(props: EndInfo) {
   }
 
   async function reset() {
-    await props.context.gameClient!.reset();
+    await props.context.gameClient!.logout();
     props.context.gameClient!.updateGameOver();
     props.context.gameClient!.updateGameStarted();
+    props.context.gameClient!.updateLogged();
   }
 
   return color === "" ? (

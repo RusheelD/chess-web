@@ -3,17 +3,19 @@ import { StartInfo } from "../../models";
 
 export function Start(props: StartInfo) {
   const [gameCode, setGameCode] = useState("");
+  if (props.context.gameContext!.game.isStarted) {
+    props.updateStart(true);
+  }
   function onStartPass() {
     if (props.context.gameContext) {
       props.context.gameContext.game.isStarted = true;
     }
     if (props.context.gameClient) {
       window.location.href =
-        window.location.protocol +
-        "?code=" +
+        window.location.href +
+        "&code=" +
         Math.floor(Math.random() * 1000000).toString() +
-        "&gamemode=Classic&playmode=pass&usercode=" +
-        Math.floor(Math.random() * 1000000).toString();
+        "&gamemode=Classic&playmode=pass";
       props.context.gameClient.initialize();
     }
     props.updateStart(true);
@@ -27,13 +29,12 @@ export function Start(props: StartInfo) {
         props.context.gameContext.game.gameCode = gameCode;
         if (props.context.gameClient) {
           window.location.href =
-            window.location.protocol +
-            "?code=" +
+            window.location.href +
+            "&code=" +
             gameCode +
             "&gamemode=" +
             gamemode +
-            "&playmode=network&usercode=" +
-            Math.floor(Math.random() * 1000000).toString();
+            "&playmode=network";
           props.context.gameClient.initialize();
         }
         props.updateStart(true);
@@ -43,10 +44,6 @@ export function Start(props: StartInfo) {
   }
   function onGameCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
     setGameCode(e.target.value);
-  }
-
-  if (props.context.gameContext!.game.isStarted) {
-    props.updateStart(true);
   }
 
   return (
