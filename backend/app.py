@@ -18,7 +18,7 @@ class AppManager():
         self.app = app
         self.updated_data = None
         self.games = {}
-        self.socketIo = flask_socketio.SocketIO(
+        self.socketIO = flask_socketio.SocketIO(
             self.app, cors_allowed_origins='*')
         self.users = AllPlayersData()
 
@@ -171,7 +171,7 @@ def select():
     return "selected"
 
 
-@app_manager.socketIo.on("select")
+@app_manager.socketIO.on("select")
 def handle_select(data):
     code, tile, choice = data
     game = app_manager.games[code].game
@@ -226,4 +226,5 @@ def classic():
 
 
 if (__name__ == '__main__'):
-    app.run()
+    app_manager.socketIO.run(app_manager.app, debug=True,
+                             allow_unsafe_werkzeug=True)
