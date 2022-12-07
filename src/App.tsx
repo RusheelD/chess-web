@@ -8,9 +8,9 @@ import { DeadPieces } from "./components/dead-pieces/DeadPieces";
 import { Promotion } from "./components/promotions/Promotion";
 import { Start } from "./components/starts/Start";
 import { End } from "./components/ends/End";
-import * as io from "socket.io-client";
+import { io } from "socket.io-client";
 import { Login } from "./components/logins/Login";
-const socket = io.connect("http://127.0.0.1:5000");
+const socket = io("http://127.0.0.1:5000", { transports: ["websocket"] });
 
 function Game() {
   const [currentPlayer, setCurrentPlayer] = useState(
