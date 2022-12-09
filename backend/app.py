@@ -227,4 +227,4 @@ def classic():
 
 if (__name__ == '__main__'):
     app_manager.socketIO.run(app_manager.app, debug=True,
-                             allow_unsafe_werkzeug=True)
+                             allow_unsafe_werkzeug=True, host='0.0.0.0')
