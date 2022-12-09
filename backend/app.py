@@ -6,13 +6,42 @@ from AIControl import AIControl
 from GameControl import GameControl
 from MultiGameControl import MultiGameControl
 
-# Initialize the app and the login manager
+"""
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import socketio
+import uvicorn
+
+
+fastapp = FastAPI()
+fastapp.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+socket_manager = socketio.AsyncServer(
+    async_mode='asgi', cors_allowed_origins='*')
+app = socketio.ASGIApp(socket_manager, fastapp)
+
+
+class AppManager():
+    def __init__(self, app, socket_manager):
+        self.app = app
+        self.updated_data = None
+        self.games = {}
+        self.socket_manager = socket_manager
+        self.users = AllPlayersData()
+
+app_manager = AppManager(app, socket_manager)
+"""
+
 app = flask.Flask(__name__)
+
 
 # AppManager class to contain and handle the details of a specific app and login manager
 # to maintain the state and manage the logic
-
-
 class AppManager():
     def __init__(self, app):
         self.app = app
@@ -76,10 +105,8 @@ app_manager = AppManager(app)
 
 
 @app_manager.app.route('/')
-def i():
+def root():
     return flask.redirect(flask.url_for('index'))
-
-# Route to index page,
 
 
 @app_manager.app.route("/index", methods=['GET', 'POST'])
@@ -208,21 +235,6 @@ def logout():
         app_manager.games[data.get('code')] = GameData(
             type(game)(), 0, app_manager.games[data.get('code')].users)
     return board(code=data.get('code'))
-
-
-@app_manager.app.route("/synchronic")
-def synchronic():
-    pass
-
-
-@app_manager.app.route("/singleplayer")
-def ai():
-    pass
-
-
-@app_manager.app.route("/twoplayer")
-def classic():
-    pass
 
 
 if (__name__ == '__main__'):
