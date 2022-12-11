@@ -7,8 +7,7 @@ from Pieces import *
 class Board(object):
 
     def __init__(self):
-        pieces_images = pyglet.image.load(os.path.relpath(
-            "C:/code/github/chess-web/backend/Pieces-Images.png"))
+        pieces_images = pyglet.image.load("Pieces-Images.png")
 
         Black_King_Image = pieces_images.get_region(0, 0, 200, 200)
         White_King_Image = pieces_images.get_region(0, 200, 200, 200)
