@@ -384,7 +384,7 @@ export class GameClient {
       },
       body: JSON.stringify({
         tile: tile.file + tile.rank,
-        choice: choice ? choice : "Queen",
+        choice: choice, // ? choice : "Queen",
         code: this.gameContext.game.gameCode
           ? this.gameContext.game.gameCode
           : "",
