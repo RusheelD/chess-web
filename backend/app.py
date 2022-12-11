@@ -256,21 +256,6 @@ async def select_post(request: Request):
     return "selected"
 
 
-"""
-@app_manager.socket_manager.on("select")
-def handle_select(*args):
-    code, tile, choice = data
-    game = app_manager.games[code].game
-    if (game is None):
-        return
-    tup = (int(tile[1]) - 1, ord(tile[0])-97)
-    game.select_tile(tup[0], tup[1], choice=choice)
-    if (not (game.is_piece_selected)):
-        await app_manager.socket_manager.emit("select", board_data(
-            code), namespace='/', broadcast=True)
-"""
-
-
 @app_manager.app.other_asgi_app.get("/reset")
 async def reset_get(request: Request):
     data = dict(await request.json())
