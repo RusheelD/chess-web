@@ -3,9 +3,10 @@ import os
 import pyglet
 from Pieces import *
 
-
 class Board(object):
 
+    # Why are we maintaining the images here? Images should always be
+    # only in the frontend. Refactor this class to not have UI elements
     def __init__(self):
         pieces_images = pyglet.image.load("Pieces-Images.png")
 
@@ -75,6 +76,8 @@ class Board(object):
         self.white_pieces = []
         self.refresh_pieces()
 
+    # Do you really need this when you have the fen? I suggest just using
+    # fen here
     def __str__(self):
         string = ""
         for row in self.grid:
@@ -157,9 +160,11 @@ class Board(object):
             self.moves_made.append(move)
         self.refresh_pieces()
 
+    # Can not have global variable like this
     def get_white_king_pos(self):
         return King.White_King_Pos
 
+    # Same as above
     def get_black_king_pos(self):
         return King.Black_King_Pos
 
@@ -172,16 +177,19 @@ class Board(object):
     def get(self, pos):
         return self.grid[pos[0]][pos[1]]
 
+    # Remove the usage of global variables here too
     def white_in_check(self):
         for piece in self.pieces:
             if (piece.color == 1 and King.White_King_Pos in piece.get_attack_moves()):
                 return True
 
+    # Same as above
     def black_in_check(self):
         for piece in self.pieces:
             if (piece.color == 0 and King.Black_King_Pos in piece.get_attack_moves()):
                 return True
 
+    # This is probably OK.
     def kings_in_check(self):
         checks = [self.white_in_check(), self.black_in_check()]
         return checks
