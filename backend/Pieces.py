@@ -393,16 +393,16 @@ class King(Piece):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    self.board.inc_white_king_moves()
                     self.board.White_King_Pos = [self.row, self.column]
+                    self.board.inc_white_king_moves()
                 elif (column == 6 and type(self.board.grid[0][7]) == Rook and self.board.grid[0][7].steps_taken == 0):
                     self.board.grid[0][7].move(0, 5, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    self.board.inc_white_king_moves()
                     self.board.White_King_Pos = [self.row, self.column]
+                    self.board.inc_white_king_moves()
             elif (row == 7 and self.board.get_black_king_moves() == 0 and not (self.black_in_check())):
                 if (column == 2 and type(self.board.grid[7][0]) == Rook and self.board.grid[7][0].steps_taken == 0):
                     self.board.grid[7][0].move(7, 3, checking)
@@ -410,24 +410,24 @@ class King(Piece):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    self.board.inc_black_king_moves()
                     self.board.Black_King_Pos = [self.row, self.column]
+                    self.board.inc_black_king_moves()
                 elif (column == 6 and type(self.board.grid[7][7]) == Rook and self.board.grid[7][7].steps_taken == 0):
                     self.board.grid[7][7].move(7, 5, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    self.board.inc_black_king_moves()
                     self.board.Black_King_Pos = [self.row, self.column]
+                    self.board.inc_black_king_moves()
         else:
             super().move(row, column, checking)
             if (self.color == 0):
-                self.board.inc_white_king_moves()
                 self.board.White_King_Pos = [self.row, self.column]
+                self.board.inc_white_king_moves()
             else:
-                self.board.inc_black_king_moves()
                 self.board.Black_King_Pos = [self.row, self.column]
+                self.board.inc_black_king_moves()
 
     def undo_move(self, row, column, temp):
         if (abs(column - self.column) == 2):
@@ -435,32 +435,32 @@ class King(Piece):
                 if (self.column == 2):
                     self.board.grid[0][3].undo_move(0, 0, None)
                     super().undo_move(row, column, temp)
-                    self.board.dec_white_king_moves()
                     self.board.White_King_Pos = [self.row, self.column]
+                    self.board.dec_white_king_moves()
                 elif (self.column == 6):
                     self.board.grid[0][5].undo_move(0, 7, None)
                     super().undo_move(row, column, temp)
-                    self.board.dec_white_king_moves()
                     self.board.White_King_Pos = [self.row, self.column]
+                    self.board.dec_white_king_moves()
             elif (row == 7):
                 if (self.column == 2):
                     self.board.grid[7][3].undo_move(7, 0, None)
                     super().undo_move(row, column, temp)
-                    self.board.dec_black_king_moves()
                     self.board.Black_King_Pos = [self.row, self.column]
+                    self.board.dec_black_king_moves()
                 elif (self.column == 6):
                     self.board.grid[7][5].undo_move(7, 7, None)
                     super().undo_move(row, column, temp)
-                    self.board.dec_black_king_moves()
                     self.board.Black_King_Pos = [self.row, self.column]
+                    self.board.dec_black_king_moves()
         else:
             super().undo_move(row, column, temp)
             if (self.color == 0):
-                self.board.dec_white_king_moves()
                 self.board.White_King_Pos = [self.row, self.column]
+                self.board.dec_white_king_moves()
             else:
-                self.board.dec_black_king_moves()
                 self.board.Black_King_Pos = [self.row, self.column]
+                self.board.dec_black_king_moves()
 
     def calculate_valid_moves(self):
 

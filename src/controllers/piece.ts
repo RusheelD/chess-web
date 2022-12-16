@@ -532,8 +532,43 @@ export class KingController implements IPieceController {
     board: BoardInfo,
     currentTile: TileInfo
   ): TileInfo[] {
+    let validMoves: TileInfo[] = [];
     let moves: TileInfo[] = this.computeAttackMoves(game, board, currentTile);
-    return removeInvalidMoves(game, board, moves, currentTile);
+    let allowLong = false;
+    let allowShort = false;
+    let rank = currentTile.piece?.color === "white" ? "1" : "8";
+
+    moves = removeInvalidMoves(game, board, moves, currentTile);
+
+    for (let move of moves) {
+      if (currentTile.piece?.moveCount === 0 && currentTile.file === "e") {
+        if (move.file === "f" && move.rank === rank) {
+          allowShort = true;
+        }
+        if (move.file === "d" && move.rank === rank) {
+          allowLong = true;
+        }
+      }
+    }
+
+    for (let move of moves) {
+      if (currentTile.piece?.moveCount === 0 && currentTile.file === "e") {
+        if (move.file === "g" && move.rank === rank && allowShort) {
+          validMoves.push(move);
+        } else if (move.file === "c" && move.rank === rank && allowLong) {
+          validMoves.push(move);
+        } else if (
+          (move.file !== "c" || move.rank !== rank) &&
+          (move.file !== "g" || move.rank !== rank)
+        ) {
+          validMoves.push(move);
+        }
+      } else {
+        validMoves.push(move);
+      }
+    }
+
+    return validMoves;
   }
 }
 
