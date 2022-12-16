@@ -1,15 +1,11 @@
-from Promote import Promote
-
-
 class Piece(object):
 
-    def __init__(self, image, row, column, color, board):
+    def __init__(self, row, column, color, board):
         piece_data = {
             King: {'speed': 5, 'value': 0, 'initial': 'k'}, Queen: {'speed': 4, 'value': 9, 'initial': 'q'},
             Rook: {'speed': 3, 'value': 5, 'initial': 'r'}, Bishop: {'speed': 2, 'value': 3, 'initial': 'b'},
             Knight: {'speed': 2, 'value': 3, 'initial': 'n'}, Pawn: {'speed': 1, 'value': 1, 'initial': 'p'}
         }
-        self.image = image
         self.row = row
         self.column = column
         self.color = color
@@ -33,7 +29,7 @@ class Piece(object):
     def refine_valid_moves(self):
         seen = []
         for move in self.valid_moves:
-            if not (move in seen):
+            if move not in seen:
                 seen.append(move)
         self.valid_moves = seen
 
@@ -117,9 +113,7 @@ class Pawn(Piece):
                 images = self.board.black_images
 
             self.board.grid[self.row][self.column] = None
-            if (choice == None and not Promote.active):
-                choice = Promote().promote(self.color)
-            if (choice == "Queen"):
+            if (choice == None or choice == "Queen"):
                 promotion = Queen(images[4], row, column,
                                   self.color, self.board)
             elif (choice == "Rook"):
@@ -380,65 +374,60 @@ class Queen(Rook, Bishop):
 
 
 class King(Piece):
-    White_King_Moves = 0
-    Black_King_Moves = 0
-    White_King_Pos = [0, 4]
-    Black_King_Pos = [7, 4]
-
     def white_in_check(self):
         for piece in self.board.pieces:
-            if (piece.color == 1 and King.White_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 1 and self.board.White_King_Pos in piece.get_attack_moves()):
                 return True
 
     def black_in_check(self):
         for piece in self.board.pieces:
-            if (piece.color == 0 and King.Black_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 0 and self.board.Black_King_Pos in piece.get_attack_moves()):
                 return True
 
     def move(self, row, column, checking=False, choice=None):
         if (abs(column - self.column) == 2):
-            if (row == 0 and King.White_King_Moves == 0 and not (self.white_in_check())):
+            if (row == 0 and self.board.get_white_king_moves() == 0 and not (self.white_in_check())):
                 if (column == 2 and type(self.board.grid[0][0]) == Rook and self.board.grid[0][0].steps_taken == 0):
                     self.board.grid[0][0].move(0, 3, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    King.White_King_Moves += 1
-                    King.White_King_Pos = [self.row, self.column]
+                    self.board.inc_white_king_moves()
+                    self.board.White_King_Pos = [self.row, self.column]
                 elif (column == 6 and type(self.board.grid[0][7]) == Rook and self.board.grid[0][7].steps_taken == 0):
                     self.board.grid[0][7].move(0, 5, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    King.White_King_Moves += 1
-                    King.White_King_Pos = [self.row, self.column]
-            elif (row == 7 and King.Black_King_Moves == 0 and not (self.black_in_check())):
+                    self.board.inc_white_king_moves()
+                    self.board.White_King_Pos = [self.row, self.column]
+            elif (row == 7 and self.board.get_black_king_moves() == 0 and not (self.black_in_check())):
                 if (column == 2 and type(self.board.grid[7][0]) == Rook and self.board.grid[7][0].steps_taken == 0):
                     self.board.grid[7][0].move(7, 3, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    King.Black_King_Moves += 1
-                    King.Black_King_Pos = [self.row, self.column]
+                    self.board.inc_black_king_moves()
+                    self.board.Black_King_Pos = [self.row, self.column]
                 elif (column == 6 and type(self.board.grid[7][7]) == Rook and self.board.grid[7][7].steps_taken == 0):
                     self.board.grid[7][7].move(7, 5, checking)
                     if (not (checking)):
                         self.board.moves_made = self.board.moves_made[:-1]
                         self.board.current_turn -= self.color
                     super().move(row, column, checking)
-                    King.Black_King_Moves += 1
-                    King.Black_King_Pos = [self.row, self.column]
+                    self.board.inc_black_king_moves()
+                    self.board.Black_King_Pos = [self.row, self.column]
         else:
             super().move(row, column, checking)
             if (self.color == 0):
-                King.White_King_Moves += 1
-                King.White_King_Pos = [self.row, self.column]
+                self.board.inc_white_king_moves()
+                self.board.White_King_Pos = [self.row, self.column]
             else:
-                King.Black_King_Moves += 1
-                King.Black_King_Pos = [self.row, self.column]
+                self.board.inc_black_king_moves()
+                self.board.Black_King_Pos = [self.row, self.column]
 
     def undo_move(self, row, column, temp):
         if (abs(column - self.column) == 2):
@@ -446,32 +435,32 @@ class King(Piece):
                 if (self.column == 2):
                     self.board.grid[0][3].undo_move(0, 0, None)
                     super().undo_move(row, column, temp)
-                    King.White_King_Moves -= 1
-                    King.White_King_Pos = [self.row, self.column]
+                    self.board.dec_white_king_moves()
+                    self.board.White_King_Pos = [self.row, self.column]
                 elif (self.column == 6):
                     self.board.grid[0][5].undo_move(0, 7, None)
                     super().undo_move(row, column, temp)
-                    King.White_King_Moves -= 1
-                    King.White_King_Pos = [self.row, self.column]
+                    self.board.dec_white_king_moves()
+                    self.board.White_King_Pos = [self.row, self.column]
             elif (row == 7):
                 if (self.column == 2):
                     self.board.grid[7][3].undo_move(7, 0, None)
                     super().undo_move(row, column, temp)
-                    King.Black_King_Moves -= 1
-                    King.Black_King_Pos = [self.row, self.column]
+                    self.board.dec_black_king_moves()
+                    self.board.Black_King_Pos = [self.row, self.column]
                 elif (self.column == 6):
                     self.board.grid[7][5].undo_move(7, 7, None)
                     super().undo_move(row, column, temp)
-                    King.Black_King_Moves -= 1
-                    King.Black_King_Pos = [self.row, self.column]
+                    self.board.dec_black_king_moves()
+                    self.board.Black_King_Pos = [self.row, self.column]
         else:
             super().undo_move(row, column, temp)
             if (self.color == 0):
-                King.White_King_Moves -= 1
-                King.White_King_Pos = [self.row, self.column]
+                self.board.dec_white_king_moves()
+                self.board.White_King_Pos = [self.row, self.column]
             else:
-                King.Black_King_Moves -= 1
-                King.Black_King_Pos = [self.row, self.column]
+                self.board.dec_black_king_moves()
+                self.board.Black_King_Pos = [self.row, self.column]
 
     def calculate_valid_moves(self):
 
@@ -577,12 +566,12 @@ class King(Piece):
                     self.valid_moves.append([self.row, self.column + 1])
 
         if (self.column == 4):
-            if (self.color == 0 and self.row == 0 and King.White_King_Moves == 0):
+            if (self.color == 0 and self.row == 0 and self.board.get_white_king_moves() == 0):
                 if (self.board.grid[0][1] == None and self.board.grid[0][2] == None and self.board.grid[0][3] == None):
                     self.valid_moves.append([0, 2])
                 if (self.board.grid[0][5] == None and self.board.grid[0][6] == None):
                     self.valid_moves.append([0, 6])
-            if (self.color == 1 and self.row == 7 and King.Black_King_Moves == 0):
+            if (self.color == 1 and self.row == 7 and self.board.get_black_king_moves() == 0):
                 if (self.board.grid[7][1] == None and self.board.grid[7][2] == None and self.board.grid[7][3] == None):
                     self.valid_moves.append([7, 2])
                 if (self.board.grid[7][5] == None and self.board.grid[7][6] == None):
@@ -612,17 +601,17 @@ class King(Piece):
         for move in self.valid_moves:
             if self.column == 4:
                 if self.color == 0:
-                    if move == [0, 2] and not ([0, 3] in self.valid_moves):
+                    if move == [0, 2] and [0, 3] not in self.valid_moves:
                         if (move in self.valid_moves):
                             self.valid_moves.remove(move)
-                    if move == [0, 6] and not ([0, 5] in self.valid_moves):
+                    if move == [0, 6] and [0, 5] not in self.valid_moves:
                         if (move in self.valid_moves):
                             self.valid_moves.remove(move)
                 if self.color == 1:
-                    if move == [7, 2] and not ([7, 3] in self.valid_moves):
+                    if move == [7, 2] and [7, 3] not in self.valid_moves:
                         if (move in self.valid_moves):
                             self.valid_moves.remove(move)
-                    if move == [7, 6] and not ([7, 5] in self.valid_moves):
+                    if move == [7, 6] and [7, 5] not in self.valid_moves:
                         if (move in self.valid_moves):
                             self.valid_moves.remove(move)
 

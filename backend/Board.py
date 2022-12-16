@@ -3,92 +3,51 @@ import os
 import pyglet
 from Pieces import *
 
+
 class Board(object):
 
-    # Why are we maintaining the images here? Images should always be
-    # only in the frontend. Refactor this class to not have UI elements
     def __init__(self):
-        pieces_images = pyglet.image.load("Pieces-Images.png")
-
-        Black_King_Image = pieces_images.get_region(0, 0, 200, 200)
-        White_King_Image = pieces_images.get_region(0, 200, 200, 200)
-        Black_Queen_Image = pieces_images.get_region(200, 0, 200, 200)
-        White_Queen_Image = pieces_images.get_region(200, 200, 200, 200)
-        Black_Bishop_Image = pieces_images.get_region(400, 0, 200, 200)
-        White_Bishop_Image = pieces_images.get_region(400, 200, 200, 200)
-        Black_Knight_Image = pieces_images.get_region(600, 0, 200, 200)
-        White_Knight_Image = pieces_images.get_region(600, 200, 200, 200)
-        Black_Rook_Image = pieces_images.get_region(800, 0, 200, 200)
-        White_Rook_Image = pieces_images.get_region(800, 200, 200, 200)
-        Black_Pawn_Image = pieces_images.get_region(1000, 0, 200, 200)
-        White_Pawn_Image = pieces_images.get_region(1000, 200, 200, 200)
-
-        self.black_images = [Black_Pawn_Image, Black_Rook_Image, Black_Knight_Image,
-                             Black_Bishop_Image, Black_Queen_Image, Black_King_Image]
-
-        self.white_images = [White_Pawn_Image, White_Rook_Image, White_Knight_Image,
-                             White_Bishop_Image, White_Queen_Image, White_King_Image]
 
         self.current_turn = 1
         self.moves_made = []
-        self.dead_white = []
-        self.dead_black = []
+        self.dead_white: list[Piece] = []
+        self.dead_black: list[Piece] = []
         self.recent_move = []
-        self.pieces = [Rook(self.white_images[1], 0, 0, 0, self), Knight(self.white_images[2], 0, 1, 0, self),
-                       Bishop(self.white_images[3], 0, 2, 0, self), Queen(
-                           self.white_images[4], 0, 3, 0, self),
-                       King(self.white_images[5], 0, 4, 0, self), Bishop(
-                           self.white_images[3], 0, 5, 0, self),
-                       Knight(self.white_images[2], 0, 6, 0, self), Rook(
-            self.white_images[1], 0, 7, 0, self),
-            Pawn(self.white_images[0], 1, 0, 0, self), Pawn(
-                self.white_images[0], 1, 1, 0, self),
-            Pawn(self.white_images[0], 1, 2, 0, self), Pawn(
-                self.white_images[0], 1, 3, 0, self),
-            Pawn(self.white_images[0], 1, 4, 0, self), Pawn(
-                self.white_images[0], 1, 5, 0, self),
-            Pawn(self.white_images[0], 1, 6, 0, self), Pawn(
-                self.white_images[0], 1, 7, 0, self),
-            Pawn(self.black_images[0], 6, 0, 1, self), Pawn(
-                self.black_images[0], 6, 1, 1, self),
-            Pawn(self.black_images[0], 6, 2, 1, self), Pawn(
-                self.black_images[0], 6, 3, 1, self),
-            Pawn(self.black_images[0], 6, 4, 1, self), Pawn(
-                self.black_images[0], 6, 5, 1, self),
-            Pawn(self.black_images[0], 6, 6, 1, self), Pawn(
-                self.black_images[0], 6, 7, 1, self),
-            Rook(self.black_images[1], 7, 0, 1, self), Knight(
-                self.black_images[2], 7, 1, 1, self),
-            Bishop(self.black_images[3], 7, 2, 1, self), Queen(
-                self.black_images[4], 7, 3, 1, self),
-            King(self.black_images[5], 7, 4, 1, self), Bishop(
-                self.black_images[3], 7, 5, 1, self),
-            Knight(self.black_images[2], 7, 6, 1, self), Rook(self.black_images[1], 7, 7, 1, self)]
-        self.grid = [[None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None, None]]
-        self.black_pieces = []
-        self.white_pieces = []
+        self.pieces: list[Piece] = [
+            Rook(0, 0, 0, self), Knight(0, 1, 0, self),
+            Bishop(0, 2, 0, self), Queen(0, 3, 0, self),
+            King(0, 4, 0, self), Bishop(0, 5, 0, self),
+            Knight(0, 6, 0, self), Rook(0, 7, 0, self),
+            Pawn(1, 0, 0, self), Pawn(1, 1, 0, self),
+            Pawn(1, 2, 0, self), Pawn(1, 3, 0, self),
+            Pawn(1, 4, 0, self), Pawn(1, 5, 0, self),
+            Pawn(1, 6, 0, self), Pawn(1, 7, 0, self),
+            Pawn(6, 0, 1, self), Pawn(6, 1, 1, self),
+            Pawn(6, 2, 1, self), Pawn(6, 3, 1, self),
+            Pawn(6, 4, 1, self), Pawn(6, 5, 1, self),
+            Pawn(6, 6, 1, self), Pawn(6, 7, 1, self),
+            Rook(7, 0, 1, self), Knight(7, 1, 1, self),
+            Bishop(7, 2, 1, self), Queen(7, 3, 1, self),
+            King(7, 4, 1, self), Bishop(7, 5, 1, self),
+            Knight(7, 6, 1, self), Rook(7, 7, 1, self)
+        ]
+        self.grid: list[list[Piece | None]] = [
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None]
+        ]
+        self.White_King_Pos = [0, 4]
+        self.Black_King_Pos = [7, 4]
+        self.black_pieces: list[Piece] = []
+        self.white_pieces: list[Piece] = []
         self.refresh_pieces()
 
-    # Do you really need this when you have the fen? I suggest just using
-    # fen here
     def __str__(self):
-        string = ""
-        for row in self.grid:
-            for piece in row:
-                string += str(piece)
-                string += "\t"
-                string += "\t" if piece == None else ""
-            string += "\n"
-        return string
-
-    def to_fen(self):
         string = ""
         for i in range(7, -1, -1):
             count = 0
@@ -160,13 +119,29 @@ class Board(object):
             self.moves_made.append(move)
         self.refresh_pieces()
 
-    # Can not have global variable like this
     def get_white_king_pos(self):
-        return King.White_King_Pos
+        return self.White_King_Pos
 
-    # Same as above
     def get_black_king_pos(self):
-        return King.Black_King_Pos
+        return self.Black_King_Pos
+
+    def get_white_king_moves(self):
+        return self.get(self.White_King_Pos).steps_taken
+
+    def get_black_king_moves(self):
+        return self.get(self.Black_King_Pos).steps_taken
+
+    def inc_white_king_moves(self):
+        self.get(self.White_King_Pos).steps_taken += 1
+
+    def inc_black_king_moves(self):
+        self.get(self.Black_King_Pos).steps_taken += 1
+
+    def dec_white_king_moves(self):
+        self.get(self.White_King_Pos).steps_taken -= 1
+
+    def dec_black_king_moves(self):
+        self.get(self.Black_King_Pos).steps_taken -= 1
 
     def update_valid_moves(self):
         self.refresh_pieces()
@@ -174,27 +149,24 @@ class Board(object):
             piece.update_valid_moves()
         self.refresh_pieces()
 
-    def get(self, pos):
+    def get(self, pos) -> Piece:
         return self.grid[pos[0]][pos[1]]
 
-    # Remove the usage of global variables here too
     def white_in_check(self):
         for piece in self.pieces:
-            if (piece.color == 1 and King.White_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 1 and self.White_King_Pos in piece.get_attack_moves()):
                 return True
 
-    # Same as above
     def black_in_check(self):
         for piece in self.pieces:
-            if (piece.color == 0 and King.Black_King_Pos in piece.get_attack_moves()):
+            if (piece.color == 0 and self.Black_King_Pos in piece.get_attack_moves()):
                 return True
 
-    # This is probably OK.
     def kings_in_check(self):
         checks = [self.white_in_check(), self.black_in_check()]
         return checks
 
-    def get_invalid_moves(self, piece):
+    def get_invalid_moves(self, piece: Piece):
         invalid_moves = []
         for move in piece.valid_moves:
             temp = self.grid[move[0]][move[1]]
@@ -227,7 +199,7 @@ class Board(object):
                 return False
         return True
 
-    def format_valid_moves(self, piece):
+    def format_valid_moves(self, piece: Piece):
         retstr = ""
         if (piece is None):
             return ""

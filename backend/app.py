@@ -24,9 +24,9 @@ app = socketio.ASGIApp(socket_manager, fastapp)
 
 class GameData():
     def __init__(self, game, logins, users):
-        self.game = game
+        self.game: GameControl = game
         self.logins = logins
-        self.users = users
+        self.users: AllPlayersData = users
 
 
 class PlayerData():
@@ -74,7 +74,7 @@ class AppManager():
     def __init__(self, app, socket_manager):
         self.app = app
         self.updated_data = None
-        self.games = {}
+        self.games: dict[str, GameData] = {}
         self.socket_manager = socket_manager
         self.users = AllPlayersData()
 
@@ -185,7 +185,7 @@ async def make(request: Request):
 def board_data(code, usercode=None):
     game = app_manager.games[code].game
     return {
-        "board": game.main_board.to_fen(),
+        "board": str(game.main_board),
         "possible": game.main_board.format_valid_moves(game.selected_piece),
         "dead_white": game.main_board.get_dead()[0],
         "dead_black": game.main_board.get_dead()[1],
