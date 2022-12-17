@@ -553,13 +553,11 @@ export class KingController implements IPieceController {
 
     for (let move of moves) {
       if (currentTile.piece?.moveCount === 0 && currentTile.file === "e") {
-        if (move.file === "g" && move.rank === rank && allowShort) {
-          validMoves.push(move);
-        } else if (move.file === "c" && move.rank === rank && allowLong) {
-          validMoves.push(move);
-        } else if (
-          (move.file !== "c" || move.rank !== rank) &&
-          (move.file !== "g" || move.rank !== rank)
+        if (
+          (move.file === "g" && move.rank === rank && allowShort) ||
+          (move.file === "c" && move.rank === rank && allowLong) ||
+          ((move.file !== "c" || move.rank !== rank) &&
+            (move.file !== "g" || move.rank !== rank))
         ) {
           validMoves.push(move);
         }
