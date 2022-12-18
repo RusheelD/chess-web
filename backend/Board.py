@@ -104,20 +104,21 @@ class Board(object):
         self.pieces = board.pieces
         self.moves_made = board.moves_made
 
-    def deep_copy(self, board):
-        self.pieces.clear()
-        for row in range(len(board.grid)):
-            for column in range(len(row)):
-                if (board.grid[row][column] != None):
-                    self.grid[row][column] = board.grid[row][column].copy()
-                    self.pieces.append(self.grid[row][column])
-                    self.refresh_pieces()
-                else:
-                    self.grid[row][column] = None
-        self.moves_made.clear()
-        for move in board.moves_made:
-            self.moves_made.append(move)
-        self.refresh_pieces()
+    # # This function isn't being used anywhere yet
+    # def deep_copy(self, board):
+    #     self.pieces.clear()
+    #     for row in range(len(board.grid)):
+    #         for column in range(len(row)):
+    #             if (board.grid[row][column] != None):
+    #                 self.grid[row][column] = board.grid[row][column].copy()
+    #                 self.pieces.append(self.grid[row][column])
+    #                 self.refresh_pieces()
+    #             else:
+    #                 self.grid[row][column] = None
+    #     self.moves_made.clear()
+    #     for move in board.moves_made:
+    #         self.moves_made.append(move)
+    #     self.refresh_pieces()
 
     def get_white_king_pos(self):
         return self.White_King_Pos

@@ -23,6 +23,8 @@ class MultiGameControl(GameControl):
         self.chosen_color = -1
         self.loaded = False
 
+    # What is the purpose of this function? Is this to fix if something
+    # goes wrong?
     def sync_boards(self):
         self.white_board.copy(self.main_board)
         self.black_board.copy(self.main_board)
@@ -37,11 +39,18 @@ class MultiGameControl(GameControl):
                 return [True, -1]
         return [False, -1]
 
+    # There seems to be two other methods white_in_check and black_in_check
+    # Can those be used here? What is the best way to reuse stuff?
+    # DRY principle == Don't Repeat Yourself
     def in_check(self, color=-1):
         if color == -1:
             color = self.color_to_move
         return self.main_board.kings_in_check()[color]
 
+    # This function does the following:
+    # 1. When a player selects a tile --
+    # 2. When both players complete their moves, update main board
+    # 3.
     def select_tile(self, row, column, choice=None, board: Board = None):
         if (board is self.white_board):
             self.chosen_color = 0
